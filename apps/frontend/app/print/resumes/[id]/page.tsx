@@ -41,7 +41,7 @@ type PageProps = {
  * Parse header font family
  */
 function parseHeaderFont(value: string | undefined): HeaderFontFamily {
-  if (value === 'serif' || value === 'sans-serif' || value === 'mono') {
+  if (value === 'serif' || value === 'sans-serif' || value === 'mono' || value === 'cambria') {
     return value;
   }
   return DEFAULT_TEMPLATE_SETTINGS.fontSize.headerFont;
@@ -51,7 +51,7 @@ function parseHeaderFont(value: string | undefined): HeaderFontFamily {
  * Parse body font family
  */
 function parseBodyFont(value: string | undefined): BodyFontFamily {
-  if (value === 'serif' || value === 'sans-serif' || value === 'mono') {
+  if (value === 'serif' || value === 'sans-serif' || value === 'mono' || value === 'cambria') {
     return value;
   }
   return DEFAULT_TEMPLATE_SETTINGS.fontSize.bodyFont;

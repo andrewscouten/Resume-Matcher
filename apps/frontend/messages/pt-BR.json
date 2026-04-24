@@ -378,7 +378,8 @@
       "fontNames": {
         "serif": "Serifada",
         "sans": "Sem Serifa",
-        "mono": "Monoespaçada"
+        "mono": "Monoespaçada",
+        "cambria": "Cambria"
       },
       "panelTitle": "Template e Formatação",
       "template": "Template",

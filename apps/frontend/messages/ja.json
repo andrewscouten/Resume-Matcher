@@ -398,7 +398,8 @@
       "fontNames": {
         "serif": "セリフ",
         "sans": "サンセリフ",
-        "mono": "等幅"
+        "mono": "等幅",
+        "cambria": "Cambria"
       },
       "options": "オプション",
       "compactMode": "コンパクトモード",

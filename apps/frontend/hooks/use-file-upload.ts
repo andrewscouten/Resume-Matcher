@@ -571,7 +571,6 @@ export const useFileUpload = (
 
       if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
         addFilesAndUpload(e.dataTransfer.files); // This is addFilesAndUpload
-        e.dataTransfer.clearData();
       }
     },
     [addFilesAndUpload, state.isUploadingGlobal, state.files.length, multiple] // addFilesAndUpload is from useCallback

@@ -398,7 +398,8 @@
       "fontNames": {
         "serif": "Serif",
         "sans": "Sans",
-        "mono": "Mono"
+        "mono": "Mono",
+        "cambria": "Cambria"
       },
       "options": "Opciones",
       "compactMode": "Modo compacto",

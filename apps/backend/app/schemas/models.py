@@ -130,6 +130,11 @@ class PersonalInfo(BaseModel):
     linkedin: str | None = None
     github: str | None = None
 
+    @field_validator("name", "title", "email", "phone", "location", mode="before")
+    @classmethod
+    def coerce_none_to_str(cls, v: object) -> str:
+        return "" if v is None else v
+
 
 class Experience(BaseModel):
     """Work experience entry."""

@@ -142,6 +142,7 @@ export const FormattingControls: React.FC<FormattingControlsProps> = ({ settings
   const getFontLabel = (font: HeaderFontFamily | BodyFontFamily) => {
     if (font === 'sans-serif') return t('builder.formatting.fontNames.sans');
     if (font === 'serif') return t('builder.formatting.fontNames.serif');
+    if (font === 'cambria') return t('builder.formatting.fontNames.cambria');
     return t('builder.formatting.fontNames.mono');
   };
 
@@ -333,27 +334,31 @@ export const FormattingControls: React.FC<FormattingControlsProps> = ({ settings
                   {t('builder.formatting.headerFontFamily')}:
                 </span>
                 <div className="flex gap-1">
-                  {(['serif', 'sans-serif', 'mono'] as HeaderFontFamily[]).map((font) => (
-                    <button
-                      key={font}
-                      onClick={() => handleHeaderFontChange(font)}
-                      className={`px-2 py-1 font-mono text-xs border transition-all ${
-                        settings.fontSize.headerFont === font
-                          ? 'bg-blue-700 text-white border-blue-700 shadow-sw-xs'
-                          : 'bg-white text-ink-soft border-steel-grey hover:border-black'
-                      }`}
-                      style={{
-                        fontFamily:
-                          font === 'serif'
-                            ? 'Georgia, serif'
-                            : font === 'mono'
-                              ? 'monospace'
-                              : 'system-ui, sans-serif',
-                      }}
-                    >
-                      {getFontLabel(font)}
-                    </button>
-                  ))}
+                  {(['serif', 'sans-serif', 'mono', 'cambria'] as HeaderFontFamily[]).map(
+                    (font) => (
+                      <button
+                        key={font}
+                        onClick={() => handleHeaderFontChange(font)}
+                        className={`px-2 py-1 font-mono text-xs border transition-all ${
+                          settings.fontSize.headerFont === font
+                            ? 'bg-blue-700 text-white border-blue-700 shadow-sw-xs'
+                            : 'bg-white text-ink-soft border-steel-grey hover:border-black'
+                        }`}
+                        style={{
+                          fontFamily:
+                            font === 'cambria'
+                              ? 'Cambria, Georgia, serif'
+                              : font === 'serif'
+                                ? 'Georgia, serif'
+                                : font === 'mono'
+                                  ? 'monospace'
+                                  : 'system-ui, sans-serif',
+                        }}
+                      >
+                        {getFontLabel(font)}
+                      </button>
+                    )
+                  )}
                 </div>
               </div>
               {/* Body Font Family */}
@@ -362,7 +367,7 @@ export const FormattingControls: React.FC<FormattingControlsProps> = ({ settings
                   {t('builder.formatting.bodyFontFamily')}:
                 </span>
                 <div className="flex gap-1">
-                  {(['serif', 'sans-serif', 'mono'] as BodyFontFamily[]).map((font) => (
+                  {(['serif', 'sans-serif', 'mono', 'cambria'] as BodyFontFamily[]).map((font) => (
                     <button
                       key={font}
                       onClick={() => handleBodyFontChange(font)}
@@ -373,11 +378,13 @@ export const FormattingControls: React.FC<FormattingControlsProps> = ({ settings
                       }`}
                       style={{
                         fontFamily:
-                          font === 'serif'
-                            ? 'Georgia, serif'
-                            : font === 'mono'
-                              ? 'monospace'
-                              : 'system-ui, sans-serif',
+                          font === 'cambria'
+                            ? 'Cambria, Georgia, serif'
+                            : font === 'serif'
+                              ? 'Georgia, serif'
+                              : font === 'mono'
+                                ? 'monospace'
+                                : 'system-ui, sans-serif',
                       }}
                     >
                       {getFontLabel(font)}
