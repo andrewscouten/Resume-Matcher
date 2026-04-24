@@ -401,6 +401,13 @@
         "mono": "等宽",
         "cambria": "Cambria"
       },
+      "nameSizePt": "Name",
+      "contactSizePt": "Contact",
+      "bodySizePt": "Body",
+      "textStyle": "Text Style",
+      "styleSection": "Sect. Hdrs",
+      "stylePosition": "Position",
+      "styleCompany": "Company",
       "options": "选项",
       "compactMode": "紧凑模式",
       "contactIcons": "联系方式图标",
@@ -413,6 +420,9 @@
       "effectiveHeaderScale": "标题缩放",
       "effectiveHeaderFont": "标题字体",
       "effectiveBodyFont": "正文字体",
+      "effectiveNameSize": "Name size",
+      "effectiveContactSize": "Contact size",
+      "effectiveBodySize": "Body size",
       "compactHint": "紧凑模式会收紧间距与行高；页边距与正文字号保持不变。",
       "resetDefaults": "恢复默认设置"
     },

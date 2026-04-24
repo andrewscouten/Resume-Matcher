@@ -36,6 +36,7 @@ import {
   updateResume,
   updateCoverLetter,
   updateOutreachMessage,
+  saveTemplateSettings,
   generateCoverLetter,
   generateOutreachMessage,
   fetchJobDescription,
@@ -254,6 +255,7 @@ const ResumeBuilderContent = () => {
           margins: { ...DEFAULT_TEMPLATE_SETTINGS.margins, ...parsed.margins },
           spacing: { ...DEFAULT_TEMPLATE_SETTINGS.spacing, ...parsed.spacing },
           fontSize: { ...DEFAULT_TEMPLATE_SETTINGS.fontSize, ...parsed.fontSize },
+          textStyle: { ...DEFAULT_TEMPLATE_SETTINGS.textStyle, ...parsed.textStyle },
         });
       } catch {
         // Use defaults
@@ -296,6 +298,18 @@ const ResumeBuilderContent = () => {
           }
           if (data.outreach_message) {
             setOutreachMessage(data.outreach_message);
+          }
+          // Load persisted template settings if available, otherwise keep localStorage
+          if (data.template_settings) {
+            const saved = data.template_settings as Partial<TemplateSettings>;
+            setTemplateSettings({
+              ...DEFAULT_TEMPLATE_SETTINGS,
+              ...saved,
+              margins: { ...DEFAULT_TEMPLATE_SETTINGS.margins, ...(saved.margins ?? {}) },
+              spacing: { ...DEFAULT_TEMPLATE_SETTINGS.spacing, ...(saved.spacing ?? {}) },
+              fontSize: { ...DEFAULT_TEMPLATE_SETTINGS.fontSize, ...(saved.fontSize ?? {}) },
+              textStyle: { ...DEFAULT_TEMPLATE_SETTINGS.textStyle, ...(saved.textStyle ?? {}) },
+            });
           }
           // Prefer processed_resume if available
           if (data.processed_resume) {
@@ -408,7 +422,10 @@ const ResumeBuilderContent = () => {
     }
     try {
       setIsSaving(true);
-      const updated = await updateResume(resumeId, resumeData);
+      const [updated] = await Promise.all([
+        updateResume(resumeId, resumeData),
+        saveTemplateSettings(resumeId, templateSettings),
+      ]);
       const nextData = (updated.processed_resume || resumeData) as ResumeData;
       setResumeData(nextData);
       setLastSavedData(nextData);

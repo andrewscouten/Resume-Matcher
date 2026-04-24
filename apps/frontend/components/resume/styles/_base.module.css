@@ -6,10 +6,22 @@
   --item-gap: 0.25rem;
   --line-height: 1.35;
   --font-size-base: 14px;
-  --header-scale: 2;
-  --section-header-scale: 1.2;
+  --section-header-font-size: 12.5pt;
   --header-font: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
   --body-font: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+
+  /* Per-element size overrides */
+  --name-font-size: 21pt;
+  --contact-font-size: 9pt;
+  --body-text-font-size: 10pt;
+
+  /* Text style: weight and style per element group */
+  --section-header-weight: 700;
+  --section-header-style: normal;
+  --item-title-weight: 700;
+  --item-title-style: normal;
+  --item-subtitle-weight: 400;
+  --item-subtitle-style: normal;
 
   /* Margin defaults - used as padding inside the resume container */
   --margin-top: 10mm;
@@ -32,20 +44,20 @@
 }
 
 .resume-name {
-  font-size: calc(var(--font-size-base) * var(--header-scale));
+  font-size: var(--name-font-size);
   font-family: var(--header-font);
   font-weight: 700;
   color: var(--resume-text-primary);
 }
 
 .resume-title {
-  font-size: calc(var(--font-size-base) * 1.15);
+  font-size: var(--contact-font-size);
   color: var(--resume-text-body);
 }
 
 .resume-meta {
   font-family: var(--resume-font-mono);
-  font-size: calc(var(--font-size-base) * 0.82);
+  font-size: var(--contact-font-size);
   color: var(--resume-text-tertiary);
 }
 
@@ -71,7 +83,7 @@
 
 .resume-text-sm {
   font-family: var(--body-font);
-  font-size: calc(var(--font-size-base) * 0.92);
+  font-size: var(--body-text-font-size);
 }
 
 .resume-text-xs {
@@ -82,28 +94,32 @@
 .resume-item-title {
   font-family: var(--body-font);
   font-size: var(--font-size-base);
-  font-weight: 700;
+  font-weight: var(--item-title-weight);
+  font-style: var(--item-title-style);
   color: var(--resume-text-primary);
 }
 
 .resume-item-title-sm {
   font-family: var(--body-font);
   font-size: calc(var(--font-size-base) * 0.9);
-  font-weight: 700;
+  font-weight: var(--item-title-weight);
+  font-style: var(--item-title-style);
   color: var(--resume-text-primary);
 }
 
 .resume-item-subtitle {
   font-family: var(--body-font);
   font-size: calc(var(--font-size-base) * 0.95);
-  font-weight: 600;
+  font-weight: var(--item-subtitle-weight);
+  font-style: var(--item-subtitle-style);
   color: var(--resume-text-secondary);
 }
 
 .resume-item-subtitle-sm {
   font-family: var(--body-font);
   font-size: calc(var(--font-size-base) * 0.88);
-  font-weight: 600;
+  font-weight: var(--item-subtitle-weight);
+  font-style: var(--item-subtitle-style);
   color: var(--resume-text-secondary);
 }
 
@@ -174,9 +190,10 @@
 
 /* Section Title - Full underline style */
 .resume-section-title {
-  font-size: calc(var(--font-size-base) * var(--section-header-scale));
+  font-size: var(--section-header-font-size);
   font-family: var(--header-font);
-  font-weight: 700;
+  font-weight: var(--section-header-weight);
+  font-style: var(--section-header-style);
   text-transform: uppercase;
   border-bottom: 1px solid var(--resume-border-primary);
   margin-bottom: var(--item-gap);
@@ -192,9 +209,10 @@
 
 /* Section Title - Small (for sidebar) - increased from 0.8x to 0.88x for better visual weight */
 .resume-section-title-sm {
-  font-size: calc(var(--font-size-base) * var(--section-header-scale) * 0.88);
+  font-size: calc(var(--section-header-font-size) * 0.88);
   font-family: var(--header-font);
-  font-weight: 700;
+  font-weight: var(--section-header-weight);
+  font-style: var(--section-header-style);
   text-transform: uppercase;
   border-bottom: 1px solid var(--resume-border-primary);
   margin-bottom: var(--item-gap);

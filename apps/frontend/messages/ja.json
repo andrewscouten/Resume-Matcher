@@ -401,6 +401,13 @@
         "mono": "等幅",
         "cambria": "Cambria"
       },
+      "nameSizePt": "Name",
+      "contactSizePt": "Contact",
+      "bodySizePt": "Body",
+      "textStyle": "Text Style",
+      "styleSection": "Sect. Hdrs",
+      "stylePosition": "Position",
+      "styleCompany": "Company",
       "options": "オプション",
       "compactMode": "コンパクトモード",
       "contactIcons": "連絡先アイコン",
@@ -413,6 +420,9 @@
       "effectiveHeaderScale": "見出しスケール",
       "effectiveHeaderFont": "見出しフォント",
       "effectiveBodyFont": "本文フォント",
+      "effectiveNameSize": "Name size",
+      "effectiveContactSize": "Contact size",
+      "effectiveBodySize": "Body size",
       "compactHint": "コンパクトモードでは間隔と行間が詰まります。余白と本文フォントサイズは維持されます。",
       "resetDefaults": "デフォルトに戻す"
     },

@@ -395,6 +395,7 @@ class ResumeFetchData(BaseModel):
     outreach_message: str | None = None
     parent_id: str | None = None  # For determining if resume is tailored
     title: str | None = None
+    template_settings: dict | None = None
 
 
 class ResumeFetchResponse(BaseModel):
@@ -711,6 +712,12 @@ class UpdateTitleRequest(BaseModel):
     """Request to update resume title."""
 
     title: str
+
+
+class UpdateTemplateSettingsRequest(BaseModel):
+    """Request to update template/formatting settings for a resume."""
+
+    settings: dict
 
 
 class ResetDatabaseRequest(BaseModel):

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
 import {
   type TemplateSettings,
+  type TextStyleSettings,
   type TemplateType,
   type PageSize,
   type SpacingLevel,
@@ -15,8 +16,6 @@ import {
   SECTION_SPACING_MAP,
   ITEM_SPACING_MAP,
   LINE_HEIGHT_MAP,
-  FONT_SIZE_MAP,
-  HEADER_SCALE_MAP,
   COMPACT_MULTIPLIER,
   COMPACT_LINE_HEIGHT_MULTIPLIER,
   TEMPLATE_OPTIONS,
@@ -80,13 +79,6 @@ export const FormattingControls: React.FC<FormattingControlsProps> = ({ settings
     });
   };
 
-  const handleFontChange = (key: keyof TemplateSettings['fontSize'], value: SpacingLevel) => {
-    onChange({
-      ...settings,
-      fontSize: { ...settings.fontSize, [key]: value },
-    });
-  };
-
   const handleHeaderFontChange = (headerFont: HeaderFontFamily) => {
     onChange({
       ...settings,
@@ -99,6 +91,17 @@ export const FormattingControls: React.FC<FormattingControlsProps> = ({ settings
       ...settings,
       fontSize: { ...settings.fontSize, bodyFont },
     });
+  };
+
+  const handleFontSizePtChange = (
+    key: 'baseSizePt' | 'sectionHeaderSizePt' | 'nameSizePt' | 'contactSizePt' | 'bodySizePt',
+    value: number
+  ) => {
+    onChange({ ...settings, fontSize: { ...settings.fontSize, [key]: value } });
+  };
+
+  const handleTextStyleChange = (key: keyof TextStyleSettings, value: boolean) => {
+    onChange({ ...settings, textStyle: { ...settings.textStyle, [key]: value } });
   };
 
   const handleCompactModeToggle = () => {
@@ -318,15 +321,19 @@ export const FormattingControls: React.FC<FormattingControlsProps> = ({ settings
               {t('builder.formatting.fontSize')}
             </h4>
             <div className="space-y-3">
-              <SpacingSelector
+              <PtSizeSlider
                 label={t('builder.formatting.baseFontSize')}
-                value={settings.fontSize.base}
-                onChange={(v) => handleFontChange('base', v)}
+                value={settings.fontSize.baseSizePt}
+                min={7}
+                max={14}
+                onChange={(v) => handleFontSizePtChange('baseSizePt', v)}
               />
-              <SpacingSelector
+              <PtSizeSlider
                 label={t('builder.formatting.headerScale')}
-                value={settings.fontSize.headerScale}
-                onChange={(v) => handleFontChange('headerScale', v)}
+                value={settings.fontSize.sectionHeaderSizePt}
+                min={8}
+                max={18}
+                onChange={(v) => handleFontSizePtChange('sectionHeaderSizePt', v)}
               />
               {/* Header Font Family */}
               <div className="flex items-center gap-2">
@@ -392,6 +399,58 @@ export const FormattingControls: React.FC<FormattingControlsProps> = ({ settings
                   ))}
                 </div>
               </div>
+              {/* Per-element pt sizes */}
+              <PtSizeSlider
+                label={t('builder.formatting.nameSizePt')}
+                value={settings.fontSize.nameSizePt}
+                min={8}
+                max={36}
+                onChange={(v) => handleFontSizePtChange('nameSizePt', v)}
+              />
+              <PtSizeSlider
+                label={t('builder.formatting.contactSizePt')}
+                value={settings.fontSize.contactSizePt}
+                min={6}
+                max={16}
+                onChange={(v) => handleFontSizePtChange('contactSizePt', v)}
+              />
+              <PtSizeSlider
+                label={t('builder.formatting.bodySizePt')}
+                value={settings.fontSize.bodySizePt}
+                min={6}
+                max={16}
+                onChange={(v) => handleFontSizePtChange('bodySizePt', v)}
+              />
+            </div>
+          </div>
+
+          {/* Text Style Section */}
+          <div>
+            <h4 className="font-mono text-xs font-bold uppercase tracking-wider mb-3 text-ink-soft">
+              {t('builder.formatting.textStyle')}
+            </h4>
+            <div className="space-y-2">
+              <StyleToggleRow
+                label={t('builder.formatting.styleSection')}
+                bold={settings.textStyle.sectionHeaderBold}
+                italic={settings.textStyle.sectionHeaderItalic}
+                onBold={(v) => handleTextStyleChange('sectionHeaderBold', v)}
+                onItalic={(v) => handleTextStyleChange('sectionHeaderItalic', v)}
+              />
+              <StyleToggleRow
+                label={t('builder.formatting.stylePosition')}
+                bold={settings.textStyle.itemTitleBold}
+                italic={settings.textStyle.itemTitleItalic}
+                onBold={(v) => handleTextStyleChange('itemTitleBold', v)}
+                onItalic={(v) => handleTextStyleChange('itemTitleItalic', v)}
+              />
+              <StyleToggleRow
+                label={t('builder.formatting.styleCompany')}
+                bold={settings.textStyle.itemSubtitleBold}
+                italic={settings.textStyle.itemSubtitleItalic}
+                onBold={(v) => handleTextStyleChange('itemSubtitleBold', v)}
+                onItalic={(v) => handleTextStyleChange('itemSubtitleItalic', v)}
+              />
             </div>
           </div>
 
@@ -473,11 +532,17 @@ export const FormattingControls: React.FC<FormattingControlsProps> = ({ settings
                 </div>
                 <div>
                   {t('builder.formatting.effectiveBaseFont')}:{' '}
-                  {FONT_SIZE_MAP[settings.fontSize.base]}
+                  {Number.isInteger(settings.fontSize.baseSizePt)
+                    ? settings.fontSize.baseSizePt
+                    : settings.fontSize.baseSizePt.toFixed(1)}
+                  pt
                 </div>
                 <div>
                   {t('builder.formatting.effectiveHeaderScale')}:{' '}
-                  {HEADER_SCALE_MAP[settings.fontSize.headerScale]}x
+                  {Number.isInteger(settings.fontSize.sectionHeaderSizePt)
+                    ? settings.fontSize.sectionHeaderSizePt
+                    : settings.fontSize.sectionHeaderSizePt.toFixed(1)}
+                  pt
                 </div>
                 <div>
                   {t('builder.formatting.effectiveHeaderFont')}:{' '}
@@ -486,6 +551,27 @@ export const FormattingControls: React.FC<FormattingControlsProps> = ({ settings
                 <div>
                   {t('builder.formatting.effectiveBodyFont')}:{' '}
                   {getFontLabel(settings.fontSize.bodyFont)}
+                </div>
+                <div>
+                  {t('builder.formatting.effectiveNameSize')}:{' '}
+                  {Number.isInteger(settings.fontSize.nameSizePt)
+                    ? settings.fontSize.nameSizePt
+                    : settings.fontSize.nameSizePt.toFixed(1)}
+                  pt
+                </div>
+                <div>
+                  {t('builder.formatting.effectiveContactSize')}:{' '}
+                  {Number.isInteger(settings.fontSize.contactSizePt)
+                    ? settings.fontSize.contactSizePt
+                    : settings.fontSize.contactSizePt.toFixed(1)}
+                  pt
+                </div>
+                <div>
+                  {t('builder.formatting.effectiveBodySize')}:{' '}
+                  {Number.isInteger(settings.fontSize.bodySizePt)
+                    ? settings.fontSize.bodySizePt
+                    : settings.fontSize.bodySizePt.toFixed(1)}
+                  pt
                 </div>
               </div>
               {settings.compactMode && (
@@ -543,6 +629,98 @@ const MarginSlider: React.FC<MarginSliderProps> = ({ label, value, onChange }) =
     </div>
   );
 };
+
+/**
+ * Pt Size Slider Component
+ *
+ * Range input for direct pt font-size values.
+ */
+interface PtSizeSliderProps {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  onChange: (value: number) => void;
+}
+
+const PtSizeSlider: React.FC<PtSizeSliderProps> = ({ label, value, min, max, onChange }) => {
+  const display = Number.isInteger(value) ? String(value) : value.toFixed(1);
+  return (
+    <div className="flex items-center gap-2">
+      <span className="font-mono text-xs w-16 text-ink-soft">{label}:</span>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={0.5}
+        value={value}
+        onChange={(e) => onChange(parseFloat(e.target.value))}
+        className="flex-1 h-1 bg-paper-tint rounded-none appearance-none cursor-pointer
+                   [&::-webkit-slider-thumb]:appearance-none
+                   [&::-webkit-slider-thumb]:w-3
+                   [&::-webkit-slider-thumb]:h-3
+                   [&::-webkit-slider-thumb]:bg-blue-700
+                   [&::-webkit-slider-thumb]:border-none
+                   [&::-webkit-slider-thumb]:cursor-pointer
+                   [&::-moz-range-thumb]:w-3
+                   [&::-moz-range-thumb]:h-3
+                   [&::-moz-range-thumb]:bg-blue-700
+                   [&::-moz-range-thumb]:border-none
+                   [&::-moz-range-thumb]:cursor-pointer"
+      />
+      <span className="font-mono text-xs w-8 text-right text-ink-soft">{display}pt</span>
+    </div>
+  );
+};
+
+/**
+ * Style Toggle Row Component
+ *
+ * Bold / Italic toggle buttons for a labelled element group.
+ */
+interface StyleToggleRowProps {
+  label: string;
+  bold: boolean;
+  italic: boolean;
+  onBold: (v: boolean) => void;
+  onItalic: (v: boolean) => void;
+}
+
+const StyleToggleRow: React.FC<StyleToggleRowProps> = ({
+  label,
+  bold,
+  italic,
+  onBold,
+  onItalic,
+}) => (
+  <div className="flex items-center gap-2">
+    <span className="font-mono text-xs w-16 text-ink-soft truncate">{label}:</span>
+    <div className="flex gap-1">
+      <button
+        onClick={() => onBold(!bold)}
+        className={`w-6 h-6 font-serif text-xs font-bold border transition-all ${
+          bold
+            ? 'bg-blue-700 text-white border-blue-700 shadow-sw-xs'
+            : 'bg-white text-ink-soft border-steel-grey hover:border-black'
+        }`}
+        title="Bold"
+      >
+        B
+      </button>
+      <button
+        onClick={() => onItalic(!italic)}
+        className={`w-6 h-6 font-serif text-xs italic border transition-all ${
+          italic
+            ? 'bg-blue-700 text-white border-blue-700 shadow-sw-xs'
+            : 'bg-white text-ink-soft border-steel-grey hover:border-black'
+        }`}
+        title="Italic"
+      >
+        I
+      </button>
+    </div>
+  </div>
+);
 
 /**
  * Spacing Selector Component

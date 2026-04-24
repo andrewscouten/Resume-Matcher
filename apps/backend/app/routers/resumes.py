@@ -39,6 +39,7 @@ from app.schemas import (
     UpdateCoverLetterRequest,
     UpdateOutreachMessageRequest,
     UpdateTitleRequest,
+    UpdateTemplateSettingsRequest,
     normalize_resume_data,
 )
 from app.services.parser import parse_document, parse_resume_to_json, restore_dates_from_markdown
@@ -631,6 +632,7 @@ async def get_resume(resume_id: str = Query(...)) -> ResumeFetchResponse:
             outreach_message=resume.get("outreach_message"),
             parent_id=resume.get("parent_id"),
             title=resume.get("title"),
+            template_settings=resume.get("template_settings"),
         ),
     )
 
@@ -1357,14 +1359,23 @@ async def download_resume_pdf(
     sectionSpacing: int = Query(3, ge=1, le=5),
     itemSpacing: int = Query(2, ge=1, le=5),
     lineHeight: int = Query(3, ge=1, le=5),
-    fontSize: int = Query(3, ge=1, le=5),
-    headerScale: int = Query(3, ge=1, le=5),
+    baseSizePt: float = Query(10.5, ge=7.0, le=14.0),
+    sectionHeaderSizePt: float = Query(12.5, ge=8.0, le=18.0),
     headerFont: str = Query("serif", pattern="^(serif|sans-serif|mono|cambria)$"),
     bodyFont: str = Query("sans-serif", pattern="^(serif|sans-serif|mono|cambria)$"),
     compactMode: bool = Query(False),
     showContactIcons: bool = Query(False),
     accentColor: str = Query("blue", pattern="^(blue|green|orange|red)$"),
     lang: str | None = Query(None, pattern="^[a-z]{2}(-[A-Z]{2})?$"),
+    nameSizePt: float = Query(21.0, ge=8.0, le=36.0),
+    contactSizePt: float = Query(9.0, ge=6.0, le=16.0),
+    bodySizePt: float = Query(10.0, ge=6.0, le=16.0),
+    sectionHeaderBold: bool = Query(True),
+    sectionHeaderItalic: bool = Query(False),
+    itemTitleBold: bool = Query(True),
+    itemTitleItalic: bool = Query(False),
+    itemSubtitleBold: bool = Query(False),
+    itemSubtitleItalic: bool = Query(False),
 ) -> Response:
     """Generate a PDF for a resume using headless Chromium.
 
@@ -1375,8 +1386,8 @@ async def download_resume_pdf(
     - sectionSpacing: gap between sections (1-5)
     - itemSpacing: gap between items (1-5)
     - lineHeight: text line height (1-5)
-    - fontSize: base font size (1-5)
-    - headerScale: header size scale (1-5)
+    - baseSizePt: item title / date font size in pt (7-14)
+    - sectionHeaderSizePt: section header font size in pt (8-18)
     - headerFont: serif, sans-serif, or mono
     - bodyFont: serif, sans-serif, or mono
     - compactMode: enable tighter spacing
@@ -1398,13 +1409,22 @@ async def download_resume_pdf(
         f"&sectionSpacing={sectionSpacing}"
         f"&itemSpacing={itemSpacing}"
         f"&lineHeight={lineHeight}"
-        f"&fontSize={fontSize}"
-        f"&headerScale={headerScale}"
+        f"&baseSizePt={baseSizePt}"
+        f"&sectionHeaderSizePt={sectionHeaderSizePt}"
         f"&headerFont={headerFont}"
         f"&bodyFont={bodyFont}"
         f"&compactMode={str(compactMode).lower()}"
         f"&showContactIcons={str(showContactIcons).lower()}"
         f"&accentColor={accentColor}"
+        f"&nameSizePt={nameSizePt}"
+        f"&contactSizePt={contactSizePt}"
+        f"&bodySizePt={bodySizePt}"
+        f"&sectionHeaderBold={str(sectionHeaderBold).lower()}"
+        f"&sectionHeaderItalic={str(sectionHeaderItalic).lower()}"
+        f"&itemTitleBold={str(itemTitleBold).lower()}"
+        f"&itemTitleItalic={str(itemTitleItalic).lower()}"
+        f"&itemSubtitleBold={str(itemSubtitleBold).lower()}"
+        f"&itemSubtitleItalic={str(itemSubtitleItalic).lower()}"
     )
     if lang:
         params = f"{params}&lang={lang}"
@@ -1525,6 +1545,19 @@ async def update_title(resume_id: str, request: UpdateTitleRequest) -> dict:
     title = request.title.strip()[:80]
     db.update_resume(resume_id, {"title": title})
     return {"message": "Title updated successfully"}
+
+
+@router.patch("/{resume_id}/template-settings")
+async def update_template_settings(
+    resume_id: str, request: UpdateTemplateSettingsRequest
+) -> dict:
+    """Persist template/formatting settings (fonts, sizes, styles) for a resume."""
+    resume = db.get_resume(resume_id)
+    if not resume:
+        raise HTTPException(status_code=404, detail="Resume not found")
+
+    db.update_resume(resume_id, {"template_settings": request.settings})
+    return {"message": "Template settings updated successfully"}
 
 
 @router.post(

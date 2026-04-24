@@ -52,6 +52,7 @@ from app.schemas.models import (
     UpdateCoverLetterRequest,
     UpdateOutreachMessageRequest,
     UpdateTitleRequest,
+    UpdateTemplateSettingsRequest,
 )
 
 __all__ = [
@@ -103,6 +104,7 @@ __all__ = [
     "UpdateCoverLetterRequest",
     "UpdateOutreachMessageRequest",
     "UpdateTitleRequest",
+    "UpdateTemplateSettingsRequest",
     "GenerateContentResponse",
     "HealthResponse",
     "StatusResponse",

@@ -32,6 +32,15 @@ export const ResumeTwoColumn: React.FC<ResumeTwoColumnProps> = ({
 }) => {
   const { personalInfo, summary, workExperience, education, personalProjects, additional } = data;
 
+  const groupedEducation = Array.from(
+    (education ?? []).reduce((map, edu) => {
+      const key = (edu.institution ?? '').trim().toLowerCase();
+      if (!map.has(key)) map.set(key, { institution: edu.institution, entries: [] });
+      map.get(key)!.entries.push(edu);
+      return map;
+    }, new Map<string, { institution: string | undefined; entries: typeof education }>())
+  );
+
   // Get sorted visible sections
   const sortedSections = getSortedSections(data);
 
@@ -368,27 +377,35 @@ export const ResumeTwoColumn: React.FC<ResumeTwoColumnProps> = ({
                 {getSectionDisplayName('education', headingFallbacks.education)}
               </h3>
               <div className={baseStyles['resume-stack']}>
-                {education.map((edu) => (
-                  <div key={edu.id}>
+                {groupedEducation.map(([key, group]) => (
+                  <div key={key}>
                     <h4
                       className={`${baseStyles['resume-item-title-sm']} ${baseStyles['sidebar-text-wrap']}`}
                     >
-                      {edu.institution}
-                      {edu.years && (
-                        <span
-                          className={`font-normal ${baseStyles['resume-date']} ${baseStyles['text-muted']}`}
-                        >
-                          {' '}
-                          | {formatDateRange(edu.years)}
-                        </span>
-                      )}
+                      {group.institution}
                     </h4>
-                    <p className={baseStyles['resume-item-subtitle-sm']}>{edu.degree}</p>
-                    {edu.description && (
-                      <p className={`${baseStyles['resume-text-xs']} ${baseStyles['resume-meta']}`}>
-                        {edu.description}
-                      </p>
-                    )}
+                    {group.entries.map((edu) => (
+                      <div key={edu.id}>
+                        <p className={baseStyles['resume-item-subtitle-sm']}>
+                          {edu.degree}
+                          {edu.years && (
+                            <span
+                              className={`font-normal ${baseStyles['resume-date']} ${baseStyles['text-muted']}`}
+                            >
+                              {' '}
+                              | {formatDateRange(edu.years)}
+                            </span>
+                          )}
+                        </p>
+                        {edu.description && (
+                          <p
+                            className={`${baseStyles['resume-text-xs']} ${baseStyles['resume-meta']}`}
+                          >
+                            {edu.description}
+                          </p>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>

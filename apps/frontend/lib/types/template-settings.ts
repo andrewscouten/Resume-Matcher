@@ -30,10 +30,22 @@ export interface SpacingSettings {
 }
 
 export interface FontSizeSettings {
-  base: SpacingLevel; // Overall text scale
-  headerScale: SpacingLevel; // Header size multiplier
+  baseSizePt: number; // Item titles, company, dates size in pt
+  sectionHeaderSizePt: number; // Section header (EXPERIENCE, EDUCATION…) size in pt
   headerFont: HeaderFontFamily; // Header font family
   bodyFont: BodyFontFamily; // Body text font family
+  nameSizePt: number; // Name heading size in pt
+  contactSizePt: number; // Contact info / title line size in pt
+  bodySizePt: number; // Bullet description size in pt
+}
+
+export interface TextStyleSettings {
+  sectionHeaderBold: boolean;
+  sectionHeaderItalic: boolean;
+  itemTitleBold: boolean;
+  itemTitleItalic: boolean;
+  itemSubtitleBold: boolean;
+  itemSubtitleItalic: boolean;
 }
 
 export interface TemplateSettings {
@@ -42,6 +54,7 @@ export interface TemplateSettings {
   margins: MarginSettings;
   spacing: SpacingSettings;
   fontSize: FontSizeSettings;
+  textStyle: TextStyleSettings;
   compactMode: boolean; // Apply tighter spacing across the board
   showContactIcons: boolean; // Show icons next to contact info
   accentColor: AccentColor; // Accent color for Modern template
@@ -55,7 +68,23 @@ export const DEFAULT_TEMPLATE_SETTINGS: TemplateSettings = {
   pageSize: 'A4',
   margins: { top: 10, bottom: 10, left: 10, right: 10 },
   spacing: { section: 3, item: 2, lineHeight: 3 },
-  fontSize: { base: 3, headerScale: 3, headerFont: 'serif', bodyFont: 'sans-serif' },
+  fontSize: {
+    baseSizePt: 10.5,
+    sectionHeaderSizePt: 12.5,
+    headerFont: 'serif',
+    bodyFont: 'sans-serif',
+    nameSizePt: 21,
+    contactSizePt: 9,
+    bodySizePt: 10,
+  },
+  textStyle: {
+    sectionHeaderBold: true,
+    sectionHeaderItalic: false,
+    itemTitleBold: true,
+    itemTitleItalic: false,
+    itemSubtitleBold: false,
+    itemSubtitleItalic: false,
+  },
   compactMode: false,
   showContactIcons: false,
   accentColor: 'blue',
@@ -182,11 +211,19 @@ export function settingsToCssVars(settings?: TemplateSettings): React.CSSPropert
     '--line-height': s.compactMode
       ? LINE_HEIGHT_MAP[s.spacing.lineHeight] * COMPACT_LINE_HEIGHT_MULTIPLIER
       : LINE_HEIGHT_MAP[s.spacing.lineHeight],
-    '--font-size-base': FONT_SIZE_MAP[s.fontSize.base],
-    '--header-scale': HEADER_SCALE_MAP[s.fontSize.headerScale],
-    '--section-header-scale': SECTION_HEADER_SCALE_MAP[s.fontSize.headerScale],
+    '--font-size-base': `${s.fontSize.baseSizePt}pt`,
+    '--section-header-font-size': `${s.fontSize.sectionHeaderSizePt}pt`,
     '--header-font': HEADER_FONT_MAP[s.fontSize.headerFont],
     '--body-font': BODY_FONT_MAP[s.fontSize.bodyFont],
+    '--name-font-size': `${s.fontSize.nameSizePt}pt`,
+    '--contact-font-size': `${s.fontSize.contactSizePt}pt`,
+    '--body-text-font-size': `${s.fontSize.bodySizePt}pt`,
+    '--section-header-weight': s.textStyle.sectionHeaderBold ? '700' : '400',
+    '--section-header-style': s.textStyle.sectionHeaderItalic ? 'italic' : 'normal',
+    '--item-title-weight': s.textStyle.itemTitleBold ? '700' : '400',
+    '--item-title-style': s.textStyle.itemTitleItalic ? 'italic' : 'normal',
+    '--item-subtitle-weight': s.textStyle.itemSubtitleBold ? '700' : '400',
+    '--item-subtitle-style': s.textStyle.itemSubtitleItalic ? 'italic' : 'normal',
     '--margin-top': `${marginTop}mm`,
     '--margin-bottom': `${marginBottom}mm`,
     '--margin-left': `${marginLeft}mm`,

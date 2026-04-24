@@ -9,6 +9,7 @@ import {
   type AccentColor,
   DEFAULT_TEMPLATE_SETTINGS,
 } from '@/lib/types/template-settings';
+
 import { API_BASE } from '@/lib/api/client';
 import { translate } from '@/lib/i18n/server';
 import { resolveLocale } from '@/lib/i18n/locale';
@@ -26,14 +27,23 @@ type PageProps = {
     sectionSpacing?: string;
     itemSpacing?: string;
     lineHeight?: string;
-    fontSize?: string;
-    headerScale?: string;
+    baseSizePt?: string;
+    sectionHeaderSizePt?: string;
     headerFont?: string;
     bodyFont?: string;
     compactMode?: string;
     showContactIcons?: string;
     accentColor?: string;
     lang?: string;
+    nameSizePt?: string;
+    contactSizePt?: string;
+    bodySizePt?: string;
+    sectionHeaderBold?: string;
+    sectionHeaderItalic?: string;
+    itemTitleBold?: string;
+    itemTitleItalic?: string;
+    itemSubtitleBold?: string;
+    itemSubtitleItalic?: string;
   }>;
 };
 
@@ -114,6 +124,21 @@ function parseSpacingLevel(value: string | undefined, defaultValue: SpacingLevel
   const num = parseInt(value, 10);
   if (isNaN(num) || num < 1 || num > 5) return defaultValue;
   return num as SpacingLevel;
+}
+
+/**
+ * Parse a float pt size, clamped to [min, max]
+ */
+function parsePtSize(
+  value: string | undefined,
+  defaultValue: number,
+  min: number,
+  max: number
+): number {
+  if (!value) return defaultValue;
+  const num = parseFloat(value);
+  if (isNaN(num)) return defaultValue;
+  return Math.max(min, Math.min(max, num));
 }
 
 /**
@@ -211,16 +236,64 @@ export default async function PrintResumePage({ params, searchParams }: PageProp
       ),
     },
     fontSize: {
-      base: parseSpacingLevel(
-        resolvedSearchParams?.fontSize,
-        DEFAULT_TEMPLATE_SETTINGS.fontSize.base
+      baseSizePt: parsePtSize(
+        resolvedSearchParams?.baseSizePt,
+        DEFAULT_TEMPLATE_SETTINGS.fontSize.baseSizePt,
+        7,
+        14
       ),
-      headerScale: parseSpacingLevel(
-        resolvedSearchParams?.headerScale,
-        DEFAULT_TEMPLATE_SETTINGS.fontSize.headerScale
+      sectionHeaderSizePt: parsePtSize(
+        resolvedSearchParams?.sectionHeaderSizePt,
+        DEFAULT_TEMPLATE_SETTINGS.fontSize.sectionHeaderSizePt,
+        8,
+        18
       ),
       headerFont: parseHeaderFont(resolvedSearchParams?.headerFont),
       bodyFont: parseBodyFont(resolvedSearchParams?.bodyFont),
+      nameSizePt: parsePtSize(
+        resolvedSearchParams?.nameSizePt,
+        DEFAULT_TEMPLATE_SETTINGS.fontSize.nameSizePt,
+        8,
+        36
+      ),
+      contactSizePt: parsePtSize(
+        resolvedSearchParams?.contactSizePt,
+        DEFAULT_TEMPLATE_SETTINGS.fontSize.contactSizePt,
+        6,
+        16
+      ),
+      bodySizePt: parsePtSize(
+        resolvedSearchParams?.bodySizePt,
+        DEFAULT_TEMPLATE_SETTINGS.fontSize.bodySizePt,
+        6,
+        16
+      ),
+    },
+    textStyle: {
+      sectionHeaderBold: parseBoolean(
+        resolvedSearchParams?.sectionHeaderBold,
+        DEFAULT_TEMPLATE_SETTINGS.textStyle.sectionHeaderBold
+      ),
+      sectionHeaderItalic: parseBoolean(
+        resolvedSearchParams?.sectionHeaderItalic,
+        DEFAULT_TEMPLATE_SETTINGS.textStyle.sectionHeaderItalic
+      ),
+      itemTitleBold: parseBoolean(
+        resolvedSearchParams?.itemTitleBold,
+        DEFAULT_TEMPLATE_SETTINGS.textStyle.itemTitleBold
+      ),
+      itemTitleItalic: parseBoolean(
+        resolvedSearchParams?.itemTitleItalic,
+        DEFAULT_TEMPLATE_SETTINGS.textStyle.itemTitleItalic
+      ),
+      itemSubtitleBold: parseBoolean(
+        resolvedSearchParams?.itemSubtitleBold,
+        DEFAULT_TEMPLATE_SETTINGS.textStyle.itemSubtitleBold
+      ),
+      itemSubtitleItalic: parseBoolean(
+        resolvedSearchParams?.itemSubtitleItalic,
+        DEFAULT_TEMPLATE_SETTINGS.textStyle.itemSubtitleItalic
+      ),
     },
     compactMode: parseBoolean(
       resolvedSearchParams?.compactMode,

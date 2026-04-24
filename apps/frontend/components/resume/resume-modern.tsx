@@ -33,6 +33,15 @@ export const ResumeModern: React.FC<ResumeModernProps> = ({
 }) => {
   const { personalInfo, summary, workExperience, education, personalProjects, additional } = data;
 
+  const groupedEducation = Array.from(
+    (education ?? []).reduce((map, edu) => {
+      const key = (edu.institution ?? '').trim().toLowerCase();
+      if (!map.has(key)) map.set(key, { institution: edu.institution, entries: [] });
+      map.get(key)!.entries.push(edu);
+      return map;
+    }, new Map<string, { institution: string | undefined; entries: typeof education }>())
+  );
+
   // Get sorted visible sections
   const sortedSections = getSortedSections(data);
 
@@ -240,24 +249,28 @@ export const ResumeModern: React.FC<ResumeModernProps> = ({
           <div key={section.id} className={baseStyles['resume-section']}>
             <h3 className={styles['section-title-accent']}>{section.displayName}</h3>
             <div className={baseStyles['resume-items']}>
-              {education.map((edu) => (
-                <div key={edu.id} className={baseStyles['resume-item']}>
-                  <div
-                    className={`flex justify-between items-baseline ${baseStyles['resume-row-tight']}`}
-                  >
-                    <h4 className={baseStyles['resume-item-title']}>{edu.institution}</h4>
-                    <span className={`${baseStyles['resume-date']} ml-4`}>
-                      {formatDateRange(edu.years)}
-                    </span>
-                  </div>
-                  <div
-                    className={`flex justify-between ${baseStyles['resume-item-subtitle']} ${baseStyles['resume-row-tight']}`}
-                  >
-                    <span>{edu.degree}</span>
-                  </div>
-                  {edu.description && (
-                    <p className={baseStyles['resume-text-sm']}>{edu.description}</p>
-                  )}
+              {groupedEducation.map(([key, group]) => (
+                <div key={key} className={baseStyles['resume-item']}>
+                  <h4 className={baseStyles['resume-item-title']}>{group.institution}</h4>
+                  {group.entries.map((edu) => (
+                    <div key={edu.id}>
+                      <div
+                        className={`flex justify-between items-baseline ${baseStyles['resume-row-tight']}`}
+                      >
+                        <span
+                          className={`${baseStyles['resume-item-subtitle']} ${baseStyles['resume-row-tight']}`}
+                        >
+                          {edu.degree}
+                        </span>
+                        <span className={`${baseStyles['resume-date']} ml-4`}>
+                          {formatDateRange(edu.years)}
+                        </span>
+                      </div>
+                      {edu.description && (
+                        <p className={baseStyles['resume-text-sm']}>{edu.description}</p>
+                      )}
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>

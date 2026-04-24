@@ -65,6 +65,7 @@ interface ResumeResponse {
     outreach_message?: string | null;
     parent_id?: string | null; // For determining if resume is tailored
     title?: string | null;
+    template_settings?: Record<string, unknown> | null;
   };
 }
 
@@ -233,13 +234,22 @@ export function getResumePdfUrl(
     params.set('sectionSpacing', String(settings.spacing.section));
     params.set('itemSpacing', String(settings.spacing.item));
     params.set('lineHeight', String(settings.spacing.lineHeight));
-    params.set('fontSize', String(settings.fontSize.base));
-    params.set('headerScale', String(settings.fontSize.headerScale));
+    params.set('baseSizePt', String(settings.fontSize.baseSizePt));
+    params.set('sectionHeaderSizePt', String(settings.fontSize.sectionHeaderSizePt));
     params.set('headerFont', settings.fontSize.headerFont);
     params.set('bodyFont', settings.fontSize.bodyFont);
     params.set('compactMode', String(settings.compactMode));
     params.set('showContactIcons', String(settings.showContactIcons));
     params.set('accentColor', settings.accentColor);
+    params.set('nameSizePt', String(settings.fontSize.nameSizePt));
+    params.set('contactSizePt', String(settings.fontSize.contactSizePt));
+    params.set('bodySizePt', String(settings.fontSize.bodySizePt));
+    params.set('sectionHeaderBold', String(settings.textStyle.sectionHeaderBold));
+    params.set('sectionHeaderItalic', String(settings.textStyle.sectionHeaderItalic));
+    params.set('itemTitleBold', String(settings.textStyle.itemTitleBold));
+    params.set('itemTitleItalic', String(settings.textStyle.itemTitleItalic));
+    params.set('itemSubtitleBold', String(settings.textStyle.itemSubtitleBold));
+    params.set('itemSubtitleItalic', String(settings.textStyle.itemSubtitleItalic));
   } else {
     params.set('template', 'swiss-single');
     params.set('pageSize', 'A4');
@@ -351,6 +361,20 @@ export async function generateOutreachMessage(resumeId: string): Promise<string>
   }
   const data = await res.json();
   return data.content;
+}
+
+/** Saves template/formatting settings (fonts, sizes, styles) for a resume */
+export async function saveTemplateSettings(
+  resumeId: string,
+  settings: TemplateSettings
+): Promise<void> {
+  const res = await apiPatch(`/resumes/${encodeURIComponent(resumeId)}/template-settings`, {
+    settings,
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Failed to save template settings (status ${res.status}): ${text}`);
+  }
 }
 
 /** Retries AI processing for a failed resume */
