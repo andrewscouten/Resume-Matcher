@@ -137,7 +137,7 @@ export const ResumeTwoColumn: React.FC<ResumeTwoColumnProps> = ({
         >
           {/* Name - Centered */}
           {personalInfo.name && (
-            <h1 className={`${baseStyles['resume-name']} tracking-tight uppercase mb-1`}>
+            <h1 className={`${baseStyles['resume-name']} tracking-tight mb-1`}>
               {personalInfo.name}
             </h1>
           )}

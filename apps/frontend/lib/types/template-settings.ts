@@ -71,8 +71,8 @@ export const DEFAULT_TEMPLATE_SETTINGS: TemplateSettings = {
   fontSize: {
     baseSizePt: 10.5,
     sectionHeaderSizePt: 12.5,
-    headerFont: 'serif',
-    bodyFont: 'sans-serif',
+    headerFont: 'cambria',
+    bodyFont: 'cambria',
     nameSizePt: 21,
     contactSizePt: 9,
     bodySizePt: 10,

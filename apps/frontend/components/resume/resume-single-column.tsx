@@ -255,11 +255,9 @@ export const ResumeSingleColumn: React.FC<ResumeSingleColumnProps> = ({
                   {group.entries.map((edu) => (
                     <div key={edu.id}>
                       <div
-                        className={`flex justify-between items-baseline ${baseStyles['resume-row-tight']}`}
+                        className={`flex justify-between items-baseline${edu.description ? ` ${baseStyles['resume-row-tight']}` : ''}`}
                       >
-                        <span
-                          className={`${baseStyles['resume-item-subtitle']} ${baseStyles['resume-row-tight']}`}
-                        >
+                        <span className={baseStyles['resume-item-subtitle']}>
                           {edu.degree}
                         </span>
                         <span className={`${baseStyles['resume-date']} ml-4`}>
@@ -307,7 +305,7 @@ export const ResumeSingleColumn: React.FC<ResumeSingleColumnProps> = ({
         >
           {/* Name - Centered */}
           {personalInfo.name && (
-            <h1 className={`${baseStyles['resume-name']} tracking-tight uppercase mb-1`}>
+            <h1 className={`${baseStyles['resume-name']} tracking-tight mb-1`}>
               {personalInfo.name}
             </h1>
           )}

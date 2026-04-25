@@ -62,14 +62,14 @@
 }
 
 .resume-meta-sm {
-  font-family: var(--resume-font-mono);
+  font-family: var(--body-font);
   font-size: var(--body-text-font-size);
   color: var(--resume-text-body);
 }
 
 /* Date formatting - ensures dates never wrap and stay right-aligned */
 .resume-date {
-  font-family: var(--resume-font-mono);
+  font-family: var(--body-font);
   font-size: var(--body-text-font-size);
   color: var(--resume-text-body);
   white-space: nowrap;
@@ -198,7 +198,6 @@
   border-bottom: 1px solid var(--resume-border-primary);
   margin-bottom: var(--item-gap);
   padding-bottom: 0.125rem;
-  letter-spacing: 0.05em;
   color: var(--resume-text-primary);
   /* Prevent title from being orphaned at bottom of page */
   break-after: avoid;
@@ -217,7 +216,6 @@
   border-bottom: 1px solid var(--resume-border-primary);
   margin-bottom: var(--item-gap);
   padding-bottom: 0.125rem;
-  letter-spacing: 0.05em;
   color: var(--resume-text-primary);
   /* Prevent title from being orphaned at bottom of page */
   break-after: avoid;
