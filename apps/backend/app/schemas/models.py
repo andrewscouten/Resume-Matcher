@@ -126,6 +126,8 @@ class PersonalInfo(BaseModel):
     email: str = ""
     phone: str = ""
     location: str = ""
+    links: str | None = None
+    orcid: str | None = None
     website: str | None = None
     linkedin: str | None = None
     github: str | None = None

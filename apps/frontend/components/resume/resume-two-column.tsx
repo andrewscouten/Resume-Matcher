@@ -168,25 +168,25 @@ export const ResumeTwoColumn: React.FC<ResumeTwoColumnProps> = ({
                 {renderContactDetail('Location', personalInfo.location)}
               </>
             )}
-            {personalInfo.website && (
+            {personalInfo.links && (
               <>
                 <span className={baseStyles['text-muted']}>,</span>
-                {renderContactDetail('Website', personalInfo.website)}
-              </>
-            )}
-            {personalInfo.linkedin && (
-              <>
-                <span className={baseStyles['text-muted']}>,</span>
-                {renderContactDetail('LinkedIn', personalInfo.linkedin)}
-              </>
-            )}
-            {personalInfo.github && (
-              <>
-                <span className={baseStyles['text-muted']}>,</span>
-                {renderContactDetail('GitHub', personalInfo.github)}
+                <span>{personalInfo.links}</span>
               </>
             )}
           </div>
+          {personalInfo.orcid && (
+            <div className={`mt-1 ${baseStyles['resume-meta']}`}>
+              <a
+                href={`https://orcid.org/${personalInfo.orcid}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${baseStyles['resume-link']} hover:underline`}
+              >
+                orcid.org/{personalInfo.orcid}
+              </a>
+            </div>
+          )}
         </header>
       )}
 
@@ -455,25 +455,32 @@ export const ResumeTwoColumn: React.FC<ResumeTwoColumnProps> = ({
           )}
 
           {/* Links Section */}
-          {personalInfo &&
-            (personalInfo.website || personalInfo.linkedin || personalInfo.github) && (
-              <div className={baseStyles['resume-section']}>
-                <h3 className={baseStyles['resume-section-title-sm']}>{headingFallbacks.links}</h3>
-                <div
-                  className={`${baseStyles['resume-stack-tight']} ${baseStyles['resume-meta-sm']}`}
-                >
-                  {personalInfo.linkedin && (
-                    <div>{renderContactDetail('LinkedIn', personalInfo.linkedin)}</div>
-                  )}
-                  {personalInfo.github && (
-                    <div>{renderContactDetail('GitHub', personalInfo.github)}</div>
-                  )}
-                  {personalInfo.website && (
-                    <div>{renderContactDetail('Website', personalInfo.website)}</div>
-                  )}
-                </div>
+          {personalInfo && (personalInfo.links || personalInfo.orcid) && (
+            <div className={baseStyles['resume-section']}>
+              <h3 className={baseStyles['resume-section-title-sm']}>{headingFallbacks.links}</h3>
+              <div
+                className={`${baseStyles['resume-stack-tight']} ${baseStyles['resume-meta-sm']}`}
+              >
+                {personalInfo.links && (
+                  <div>
+                    <span>{personalInfo.links}</span>
+                  </div>
+                )}
+                {personalInfo.orcid && (
+                  <div>
+                    <a
+                      href={`https://orcid.org/${personalInfo.orcid}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`${baseStyles['resume-link']} hover:underline`}
+                    >
+                      orcid.org/{personalInfo.orcid}
+                    </a>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+          )}
         </div>
       </div>
     </>

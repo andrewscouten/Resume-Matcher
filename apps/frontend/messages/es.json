@@ -433,6 +433,8 @@
         "email": "juan@example.com",
         "phone": "+34 600 000 000",
         "location": "Ciudad, País",
+        "orcid": "0000-0001-2345-6789",
+        "links": "github.com/juan · portfolio.com",
         "website": "portfolio.com",
         "linkedin": "linkedin.com/in/juan",
         "github": "github.com/juan"
@@ -763,6 +765,8 @@
       "email": "Correo Electrónico",
       "phone": "Teléfono",
       "location": "Ubicación",
+      "links": "Enlaces",
+      "orcid": "ORCID",
       "website": "Sitio Web",
       "linkedin": "LinkedIn",
       "github": "GitHub"

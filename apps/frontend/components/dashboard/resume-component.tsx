@@ -19,6 +19,8 @@ export interface PersonalInfo {
   email?: string;
   phone?: string;
   location?: string;
+  links?: string;
+  orcid?: string;
   website?: string;
   linkedin?: string;
   github?: string;

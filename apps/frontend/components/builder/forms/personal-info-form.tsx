@@ -3,6 +3,7 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { PersonalInfo } from '@/components/dashboard/resume-component';
 import { useTranslations } from '@/lib/i18n';
 
@@ -106,49 +107,38 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data, onChan
         </div>
         <div className="space-y-2">
           <Label
-            htmlFor="website"
+            htmlFor="orcid"
             className="font-mono text-xs uppercase tracking-wider text-steel-grey"
           >
-            {t('resume.personalInfo.website')}
+            {t('resume.personalInfo.orcid')}
           </Label>
           <Input
-            id="website"
-            value={data.website || ''}
-            onChange={(e) => handleChange('website', e.target.value)}
-            placeholder={t('builder.personalInfoForm.placeholders.website')}
+            id="orcid"
+            value={data.orcid || ''}
+            onChange={(e) => handleChange('orcid', e.target.value)}
+            placeholder={t('builder.personalInfoForm.placeholders.orcid')}
             className="rounded-none border-black focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-700 bg-transparent"
           />
         </div>
-        <div className="space-y-2">
-          <Label
-            htmlFor="linkedin"
-            className="font-mono text-xs uppercase tracking-wider text-steel-grey"
-          >
-            {t('resume.personalInfo.linkedin')}
-          </Label>
-          <Input
-            id="linkedin"
-            value={data.linkedin || ''}
-            onChange={(e) => handleChange('linkedin', e.target.value)}
-            placeholder={t('builder.personalInfoForm.placeholders.linkedin')}
-            className="rounded-none border-black focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-700 bg-transparent"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label
-            htmlFor="github"
-            className="font-mono text-xs uppercase tracking-wider text-steel-grey"
-          >
-            {t('resume.personalInfo.github')}
-          </Label>
-          <Input
-            id="github"
-            value={data.github || ''}
-            onChange={(e) => handleChange('github', e.target.value)}
-            placeholder={t('builder.personalInfoForm.placeholders.github')}
-            className="rounded-none border-black focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-700 bg-transparent"
-          />
-        </div>
+      </div>
+      <div className="space-y-2">
+        <Label
+          htmlFor="links"
+          className="font-mono text-xs uppercase tracking-wider text-steel-grey"
+        >
+          {t('resume.personalInfo.links')}
+        </Label>
+        <Textarea
+          id="links"
+          value={data.links || ''}
+          onChange={(e) => handleChange('links', e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') e.stopPropagation();
+          }}
+          placeholder={t('builder.personalInfoForm.placeholders.links')}
+          className="rounded-none border-black focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-700 bg-transparent"
+          rows={2}
+        />
       </div>
     </div>
   );

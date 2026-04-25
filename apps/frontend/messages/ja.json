@@ -433,6 +433,8 @@
         "email": "taro@example.com",
         "phone": "+81 90-0000-0000",
         "location": "都市、国",
+        "orcid": "0000-0001-2345-6789",
+        "links": "github.com/taro · portfolio.com",
         "website": "portfolio.com",
         "linkedin": "linkedin.com/in/taro",
         "github": "github.com/taro"
@@ -763,6 +765,8 @@
       "email": "メールアドレス",
       "phone": "電話番号",
       "location": "所在地",
+      "links": "リンク",
+      "orcid": "ORCID",
       "website": "ウェブサイト",
       "linkedin": "LinkedIn",
       "github": "GitHub"

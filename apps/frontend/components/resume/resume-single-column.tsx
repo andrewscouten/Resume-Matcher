@@ -338,25 +338,25 @@ export const ResumeSingleColumn: React.FC<ResumeSingleColumnProps> = ({
                 {renderContactDetail('Location', personalInfo.location)}
               </>
             )}
-            {personalInfo.website && (
+            {personalInfo.links && (
               <>
                 <span className={baseStyles['text-muted']}>,</span>
-                {renderContactDetail('Website', personalInfo.website)}
-              </>
-            )}
-            {personalInfo.linkedin && (
-              <>
-                <span className={baseStyles['text-muted']}>,</span>
-                {renderContactDetail('LinkedIn', personalInfo.linkedin)}
-              </>
-            )}
-            {personalInfo.github && (
-              <>
-                <span className={baseStyles['text-muted']}>,</span>
-                {renderContactDetail('GitHub', personalInfo.github)}
+                <span style={{ color: 'var(--resume-text-primary)' }}>{personalInfo.links}</span>
               </>
             )}
           </div>
+          {personalInfo.orcid && (
+            <div className={`mt-1 ${baseStyles['resume-meta']}`}>
+              <a
+                href={`https://orcid.org/${personalInfo.orcid}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${baseStyles['resume-link']} hover:underline`}
+              >
+                orcid.org/{personalInfo.orcid}
+              </a>
+            </div>
+          )}
         </header>
       )}
 

@@ -63,15 +63,15 @@
 
 .resume-meta-sm {
   font-family: var(--resume-font-mono);
-  font-size: calc(var(--font-size-base) * 0.75);
-  color: var(--resume-text-tertiary);
+  font-size: var(--body-text-font-size);
+  color: var(--resume-text-body);
 }
 
 /* Date formatting - ensures dates never wrap and stay right-aligned */
 .resume-date {
   font-family: var(--resume-font-mono);
-  font-size: calc(var(--font-size-base) * 0.75);
-  color: var(--resume-text-tertiary);
+  font-size: var(--body-text-font-size);
+  color: var(--resume-text-body);
   white-space: nowrap;
   flex-shrink: 0;
   text-align: right;

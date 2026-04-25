@@ -12,6 +12,8 @@ interface ProcessedResume {
     email?: string;
     phone?: string;
     location?: string;
+    links?: string | null;
+    orcid?: string | null;
     website?: string | null;
     linkedin?: string | null;
     github?: string | null;

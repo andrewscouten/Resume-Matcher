@@ -433,6 +433,8 @@
         "email": "zhangsan@example.com",
         "phone": "+86 138 0000 0000",
         "location": "城市，国家",
+        "orcid": "0000-0001-2345-6789",
+        "links": "github.com/zhangsan · portfolio.com",
         "website": "portfolio.com",
         "linkedin": "linkedin.com/in/zhangsan",
         "github": "github.com/zhangsan"
@@ -763,6 +765,8 @@
       "email": "电子邮箱",
       "phone": "电话",
       "location": "所在地",
+      "links": "链接",
+      "orcid": "ORCID",
       "website": "个人网站",
       "linkedin": "领英",
       "github": "GitHub"

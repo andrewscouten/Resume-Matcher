@@ -433,6 +433,8 @@
         "email": "joao@exemplo.com",
         "phone": "+55 (11) 99999-0000",
         "location": "São Paulo, Brasil",
+        "orcid": "0000-0001-2345-6789",
+        "links": "github.com/joao · portfolio.com",
         "website": "portfolio.com",
         "linkedin": "linkedin.com/in/joao",
         "github": "github.com/joao"
@@ -763,6 +765,8 @@
       "email": "Email",
       "phone": "Telefone",
       "location": "Localização",
+      "links": "Links",
+      "orcid": "ORCID",
       "website": "Website",
       "linkedin": "LinkedIn",
       "github": "GitHub"
