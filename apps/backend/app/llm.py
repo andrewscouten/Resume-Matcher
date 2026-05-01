@@ -1,5 +1,6 @@
 """LiteLLM wrapper for multi-provider AI support."""
 
+import asyncio
 import json
 import logging
 import re
@@ -39,6 +40,17 @@ litellm.modify_params = True
 LLM_TIMEOUT_HEALTH_CHECK = 30
 LLM_TIMEOUT_COMPLETION = 120
 LLM_TIMEOUT_JSON = 180  # JSON completions may take longer
+
+# Ollama context window override — the default is only 2048–4096 tokens,
+# which is too small for full resume + JD prompts (~4000–6000 tokens).
+OLLAMA_NUM_CTX = 8192
+
+# Ollama "model loading" retry — Ollama holds the connection for ~40s then
+# returns this error while the model is still being read into memory.
+# We poll until ready rather than surfacing a transient failure to the user.
+_MODEL_LOADING_PHRASES = ("loading model", "server loading", "llm server loading")
+MODEL_LOADING_POLL_SECONDS = 10   # seconds between loading-state retries
+MODEL_LOADING_MAX_RETRIES = 18    # 18 × 10s = 3-minute ceiling
 
 # JSON-010: JSON extraction safety limits
 MAX_JSON_EXTRACTION_RECURSION = 10
@@ -495,6 +507,39 @@ def _build_router(config: LLMConfig) -> Router:
     )
 
 
+def _is_model_loading_error(exc: Exception) -> bool:
+    """Return True if Ollama is still loading the model into memory."""
+    msg = str(exc).lower()
+    return any(phrase in msg for phrase in _MODEL_LOADING_PHRASES)
+
+
+async def _acompletion_with_loading_retry(
+    router: Router,
+    **kwargs: Any,
+) -> Any:
+    """Call router.acompletion, re-trying while Ollama reports 'loading model'.
+
+    Ollama holds the connection for ~40 s then returns this transient error
+    while the model is being paged into CPU memory.  Rather than propagating
+    the failure we poll every MODEL_LOADING_POLL_SECONDS until the model is
+    ready or MODEL_LOADING_MAX_RETRIES is exhausted.
+    """
+    for loading_attempt in range(MODEL_LOADING_MAX_RETRIES + 1):
+        try:
+            return await router.acompletion(**kwargs)
+        except litellm.APIConnectionError as exc:
+            if not _is_model_loading_error(exc) or loading_attempt >= MODEL_LOADING_MAX_RETRIES:
+                raise
+            logging.info(
+                "Ollama model still loading (attempt %d/%d), retrying in %ds...",
+                loading_attempt + 1,
+                MODEL_LOADING_MAX_RETRIES,
+                MODEL_LOADING_POLL_SECONDS,
+            )
+            await asyncio.sleep(MODEL_LOADING_POLL_SECONDS)
+    raise RuntimeError("Unreachable")  # loop always raises or returns
+
+
 def get_router(config: LLMConfig | None = None) -> tuple[Router, LLMConfig]:
     """Get or rebuild the LiteLLM Router.
 
@@ -552,10 +597,12 @@ async def check_llm_health(
             "max_tokens": 64,
             "api_key": _effective_api_key(config.provider, config.api_key),
             "api_base": _normalize_api_base(config.provider, config.api_base),
-            "timeout": LLM_TIMEOUT_HEALTH_CHECK,
+            "timeout": _calculate_timeout("health_check", provider=config.provider),
         }
         if config.reasoning_effort:
             kwargs["reasoning_effort"] = config.reasoning_effort
+        if config.provider == "ollama":
+            kwargs["num_ctx"] = OLLAMA_NUM_CTX
 
         response = await litellm.acompletion(**kwargs)
         content = _extract_choice_text(response.choices[0])
@@ -617,7 +664,9 @@ async def check_llm_health(
         # Provide a minimal, actionable client-facing hint without leaking secrets.
         error_code = "health_check_failed"
         message = str(e)
-        if "404" in message and "/v1/v1/" in message:
+        if _is_model_loading_error(e):
+            error_code = "model_loading"
+        elif "404" in message and "/v1/v1/" in message:
             error_code = "duplicate_v1_path"
         elif "404" in message:
             error_code = "not_found_404"
@@ -664,12 +713,14 @@ async def complete(
             "messages": messages,
             "max_tokens": max_tokens,
             "temperature": temperature,
-            "timeout": LLM_TIMEOUT_COMPLETION,
+            "timeout": _calculate_timeout("completion", max_tokens, config.provider),
         }
         if config.reasoning_effort:
             kwargs["reasoning_effort"] = config.reasoning_effort
+        if config.provider == "ollama":
+            kwargs["num_ctx"] = OLLAMA_NUM_CTX
 
-        response = await router.acompletion(**kwargs)
+        response = await _acompletion_with_loading_retry(router, **kwargs)
 
         content = _extract_choice_text(response.choices[0])
         if not content:
@@ -779,7 +830,8 @@ def _calculate_timeout(
         "openai": 1.0,
         "anthropic": 1.2,
         "openrouter": 1.5,  # More variable latency
-        "ollama": 2.0,  # Local models can be slower
+        "ollama": 5.0,  # Local CPU models can take minutes per generation
+        "openai_compatible": 5.0,  # Local CPU models (llama.cpp, LM Studio, etc.)
     }
     provider_factor = provider_factors.get(provider, 1.0)
 
@@ -925,12 +977,14 @@ async def complete_json(
             }
             if config.reasoning_effort:
                 kwargs["reasoning_effort"] = config.reasoning_effort
+            if config.provider == "ollama":
+                kwargs["num_ctx"] = OLLAMA_NUM_CTX
 
             # Add JSON mode if supported
             if use_json_mode:
                 kwargs["response_format"] = {"type": "json_object"}
 
-            response = await router.acompletion(**kwargs)
+            response = await _acompletion_with_loading_retry(router, **kwargs)
             content = _extract_choice_text(response.choices[0])
 
             if not content:

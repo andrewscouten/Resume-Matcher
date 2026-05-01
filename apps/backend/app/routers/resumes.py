@@ -6,13 +6,13 @@ import hashlib
 import json
 import logging
 import unicodedata
-from collections.abc import Awaitable
+from collections.abc import AsyncGenerator, Awaitable
 from pathlib import Path
 from typing import Any, NoReturn
 from uuid import uuid4
 
 from fastapi import APIRouter, File, HTTPException, Query, UploadFile
-from fastapi.responses import Response
+from fastapi.responses import Response, StreamingResponse
 
 from app.config_cache import get_content_language, load_config as _load_config
 from app.database import db
@@ -663,13 +663,16 @@ async def list_resumes(include_master: bool = Query(False)) -> ResumeListRespons
     return ResumeListResponse(request_id=str(uuid4()), data=summaries)
 
 
-@router.post("/improve/preview", response_model=ImproveResumeResponse)
+@router.post("/improve/preview")
 async def improve_resume_preview_endpoint(
     request: ImproveResumeRequest,
-) -> ImproveResumeResponse:
+) -> StreamingResponse:
     """Preview a tailored resume without persisting it.
 
-    The response includes resume_preview data but leaves resume_id null.
+    Returns an SSE stream so the Next.js dev-server proxy never sees an idle
+    socket (which it would kill after ~30 s).  Keep-alive comments are sent
+    every 5 s during LLM processing; the final result arrives as a JSON data
+    event.  The response_id null on resume_id signals a preview-only result.
     """
     resume = db.get_resume(request.resume_id)
     if not resume:
@@ -682,31 +685,64 @@ async def improve_resume_preview_endpoint(
     language = get_content_language()
     prompt_id = request.prompt_id or _get_default_prompt_id()
 
-    stage = "load_job_keywords"
-    detail = "Failed to preview resume. Please try again."
-    try:
-        return await asyncio.wait_for(
+    async def _generate() -> AsyncGenerator[bytes, None]:
+        task: asyncio.Task[ImproveResumeResponse] = asyncio.create_task(
             _improve_preview_flow(
                 request=request,
                 resume=resume,
                 job=job,
                 language=language,
                 prompt_id=prompt_id,
-            ),
-            timeout=240.0,  # 4-minute hard limit
+            )
         )
-    except asyncio.TimeoutError:
-        logger.error(
-            "Improve preview timed out after 240s for resume %s / job %s",
-            request.resume_id,
-            request.job_id,
-        )
-        raise HTTPException(
-            status_code=504,
-            detail="Resume tailoring timed out. Please try again with a shorter job description or a simpler prompt.",
-        )
-    except Exception as e:
-        _raise_improve_error("preview", stage, e, detail)
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + 1800.0  # 30-minute ceiling
+        try:
+            while not task.done():
+                remaining = deadline - loop.time()
+                if remaining <= 0:
+                    task.cancel()
+                    yield b"data: " + json.dumps({
+                        "__error__": "Resume tailoring timed out. Please try again."
+                    }).encode() + b"\n\n"
+                    return
+                done, _ = await asyncio.wait({task}, timeout=min(5.0, remaining))
+                if not done:
+                    yield b": keep-alive\n\n"
+
+            result = task.result()  # re-raises if the task failed
+            yield b"data: " + result.model_dump_json().encode() + b"\n\n"
+            yield b"data: [DONE]\n\n"
+
+        except HTTPException as exc:
+            logger.error(
+                "Improve preview rejected for resume %s / job %s: %s",
+                request.resume_id, request.job_id, exc.detail,
+            )
+            yield b"data: " + json.dumps({
+                "__error__": exc.detail,
+                "__status__": exc.status_code,
+            }).encode() + b"\n\n"
+        except Exception as exc:
+            logger.error(
+                "Improve preview failed for resume %s / job %s: %s",
+                request.resume_id, request.job_id, exc,
+            )
+            yield b"data: " + json.dumps({
+                "__error__": "Failed to preview resume. Please try again.",
+            }).encode() + b"\n\n"
+        finally:
+            if not task.done():
+                task.cancel()
+
+    return StreamingResponse(
+        _generate(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 async def _improve_preview_flow(
@@ -921,11 +957,17 @@ async def _improve_preview_flow(
     )
 
 
-@router.post("/improve/confirm", response_model=ImproveResumeResponse)
+@router.post("/improve/confirm")
 async def improve_resume_confirm_endpoint(
     request: ImproveResumeConfirmRequest,
-) -> ImproveResumeResponse:
-    """Confirm and persist a tailored resume."""
+) -> StreamingResponse:
+    """Confirm and persist a tailored resume.
+
+    Returns an SSE stream so the Next.js dev-server proxy never sees an idle
+    socket (which it would kill after ~30 s).  Keep-alive comments are sent
+    every 5 s during LLM processing; the final result arrives as a JSON data
+    event.
+    """
     resume = db.get_resume(request.resume_id)
     if not resume:
         raise HTTPException(status_code=404, detail="Resume not found")
@@ -934,6 +976,67 @@ async def improve_resume_confirm_endpoint(
     if not job:
         raise HTTPException(status_code=404, detail="Job description not found")
 
+    async def _generate() -> AsyncGenerator[bytes, None]:
+        task: asyncio.Task[ImproveResumeResponse] = asyncio.create_task(
+            _improve_confirm_flow(request=request, resume=resume, job=job)
+        )
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + 1800.0  # 30-minute ceiling
+        try:
+            while not task.done():
+                remaining = deadline - loop.time()
+                if remaining <= 0:
+                    task.cancel()
+                    yield b"data: " + json.dumps({
+                        "__error__": "Resume saving timed out. Please try again."
+                    }).encode() + b"\n\n"
+                    return
+                done, _ = await asyncio.wait({task}, timeout=min(5.0, remaining))
+                if not done:
+                    yield b": keep-alive\n\n"
+
+            result = task.result()  # re-raises if the task failed
+            yield b"data: " + result.model_dump_json().encode() + b"\n\n"
+            yield b"data: [DONE]\n\n"
+
+        except HTTPException as exc:
+            logger.error(
+                "Improve confirm rejected for resume %s / job %s: %s",
+                request.resume_id, request.job_id, exc.detail,
+            )
+            yield b"data: " + json.dumps({
+                "__error__": exc.detail,
+                "__status__": exc.status_code,
+            }).encode() + b"\n\n"
+        except Exception as exc:
+            logger.error(
+                "Improve confirm failed for resume %s / job %s: %s",
+                request.resume_id, request.job_id, exc,
+            )
+            yield b"data: " + json.dumps({
+                "__error__": "Failed to save resume. Please try again.",
+            }).encode() + b"\n\n"
+        finally:
+            if not task.done():
+                task.cancel()
+
+    return StreamingResponse(
+        _generate(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
+async def _improve_confirm_flow(
+    *,
+    request: ImproveResumeConfirmRequest,
+    resume: dict[str, Any],
+    job: dict[str, Any],
+) -> ImproveResumeResponse:
+    """Inner flow for improve/confirm, extracted so it can be wrapped with keep-alive SSE."""
     feature_config = _load_config()
     enable_cover_letter = feature_config.get("enable_cover_letter", False)
     enable_outreach = feature_config.get("enable_outreach_message", False)

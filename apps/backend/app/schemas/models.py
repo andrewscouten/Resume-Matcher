@@ -762,7 +762,7 @@ class ResumeChange(BaseModel):
         description="Dot+bracket path, e.g. 'workExperience[0].description[1]'"
     )
     action: Literal["replace", "append", "reorder"]
-    original: str | None = Field(
+    original: str | list[str] | None = Field(
         default=None, description="Current text at path — for verification"
     )
     value: str | list[str] = Field(description="New content")
