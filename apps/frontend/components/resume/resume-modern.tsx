@@ -53,35 +53,56 @@ export const ResumeModern: React.FC<ResumeModernProps> = ({
     Website: <Globe size={12} />,
     LinkedIn: <Linkedin size={12} />,
     GitHub: <Github size={12} />,
+    ORCID: <ExternalLink size={12} />,
   };
 
   // Helper function to render contact details
   const renderContactDetail = (label: string, value?: string, hrefPrefix: string = '') => {
     if (!value) return null;
 
-    let finalHrefPrefix = hrefPrefix;
-    if (
-      ['Website', 'LinkedIn', 'GitHub'].includes(label) &&
-      !value.startsWith('http') &&
-      !value.startsWith('//')
-    ) {
-      finalHrefPrefix = 'https://';
+    let href = '';
+    let displayText: string = value;
+    let isLink = false;
+
+    if (label === 'LinkedIn') {
+      const clean = value.replace(/^https?:\/\/(?:www\.)?/, '');
+      href = clean.includes('linkedin.com')
+        ? `https://${clean}`
+        : `https://linkedin.com/in/${clean}`;
+      const match = href.match(/linkedin\.com\/in\/([^/?#\s]+)/);
+      displayText = match ? match[1] : clean;
+      isLink = true;
+    } else if (label === 'GitHub') {
+      const clean = value.replace(/^https?:\/\/(?:www\.)?/, '');
+      href = clean.includes('github.com') ? `https://${clean}` : `https://github.com/${clean}`;
+      const match = href.match(/github\.com\/([^/?#\s]+)/);
+      displayText = match ? match[1] : clean;
+      isLink = true;
+    } else if (label === 'ORCID') {
+      const cleanId = value
+        .replace(/^https?:\/\/(?:www\.)?orcid\.org\//, '')
+        .replace(/^orcid\.org\//, '');
+      href = `https://orcid.org/${cleanId}`;
+      displayText = `orcid.org/${cleanId}`;
+      isLink = true;
+    } else {
+      let finalHrefPrefix = hrefPrefix;
+      if (label === 'Website' && !value.startsWith('http') && !value.startsWith('//')) {
+        finalHrefPrefix = 'https://';
+      }
+      href = finalHrefPrefix + value;
+      isLink = href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('tel:');
+      if (label === 'Website' && isLink) {
+        displayText = value.replace(/^https?:\/\//, '').replace(/^www\./, '');
+      }
     }
 
-    const href = finalHrefPrefix + value;
-    const isLink =
-      finalHrefPrefix.startsWith('http') ||
-      finalHrefPrefix.startsWith('mailto:') ||
-      finalHrefPrefix.startsWith('tel:');
-
-    let displayText = value;
-    if (isLink && (label === 'LinkedIn' || label === 'GitHub' || label === 'Website')) {
-      displayText = value.replace(/^https?:\/\//, '').replace(/^www\./, '');
-    }
+    // Profile identity links always show their icon; contact details respect showContactIcons
+    const showIcon = ['LinkedIn', 'GitHub', 'ORCID'].includes(label) || showContactIcons;
 
     return (
       <span className="inline-flex items-center gap-1">
-        {showContactIcons && contactIcons[label]}
+        {showIcon && contactIcons[label]}
         {isLink ? (
           <a
             href={href}
@@ -257,9 +278,7 @@ export const ResumeModern: React.FC<ResumeModernProps> = ({
                       <div
                         className={`flex justify-between items-baseline${edu.description ? ` ${baseStyles['resume-row-tight']}` : ''}`}
                       >
-                        <span className={baseStyles['resume-item-subtitle']}>
-                          {edu.degree}
-                        </span>
+                        <span className={baseStyles['resume-item-subtitle']}>{edu.degree}</span>
                         <span className={`${baseStyles['resume-date']} ml-4`}>
                           {formatDateRange(edu.years)}
                         </span>
@@ -321,7 +340,7 @@ export const ResumeModern: React.FC<ResumeModernProps> = ({
             </h2>
           )}
 
-          {/* Contact - Own line, centered */}
+          {/* Contact row 1: Email, Phone, Location */}
           <div
             className={`flex flex-wrap justify-center gap-x-1 gap-y-1 ${baseStyles['resume-meta']}`}
           >
@@ -345,16 +364,27 @@ export const ResumeModern: React.FC<ResumeModernProps> = ({
               </>
             )}
           </div>
-          {personalInfo.orcid && (
-            <div className={`mt-1 ${baseStyles['resume-meta']}`}>
-              <a
-                href={`https://orcid.org/${personalInfo.orcid}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${baseStyles['resume-link']} hover:underline`}
-              >
-                orcid.org/{personalInfo.orcid}
-              </a>
+
+          {/* Contact row 2: LinkedIn, GitHub, ORCID */}
+          {(personalInfo.linkedin || personalInfo.github || personalInfo.orcid) && (
+            <div
+              className={`flex flex-wrap justify-center gap-x-1 gap-y-1 mt-1 ${baseStyles['resume-meta']}`}
+            >
+              {renderContactDetail('LinkedIn', personalInfo.linkedin)}
+              {personalInfo.github && (
+                <>
+                  {personalInfo.linkedin && <span className={baseStyles['text-muted']}>,</span>}
+                  {renderContactDetail('GitHub', personalInfo.github)}
+                </>
+              )}
+              {personalInfo.orcid && (
+                <>
+                  {(personalInfo.linkedin || personalInfo.github) && (
+                    <span className={baseStyles['text-muted']}>,</span>
+                  )}
+                  {renderContactDetail('ORCID', personalInfo.orcid)}
+                </>
+              )}
             </div>
           )}
         </header>

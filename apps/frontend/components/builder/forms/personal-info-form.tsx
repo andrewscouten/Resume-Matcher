@@ -27,6 +27,7 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data, onChan
       <h3 className="font-serif text-xl font-bold border-b border-black pb-2 mb-4">
         {t('builder.personalInfo')}
       </h3>
+      {/* Row 1: Name and Title */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label
@@ -58,6 +59,10 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data, onChan
             className="rounded-none border-black focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-700 bg-transparent"
           />
         </div>
+      </div>
+
+      {/* Row 2: Email, Phone, Location */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label
             htmlFor="email"
@@ -102,6 +107,40 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ data, onChan
             value={data.location || ''}
             onChange={(e) => handleChange('location', e.target.value)}
             placeholder={t('builder.personalInfoForm.placeholders.location')}
+            className="rounded-none border-black focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-700 bg-transparent"
+          />
+        </div>
+      </div>
+
+      {/* Row 3: LinkedIn, GitHub, ORCID */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="space-y-2">
+          <Label
+            htmlFor="linkedin"
+            className="font-mono text-xs uppercase tracking-wider text-steel-grey"
+          >
+            {t('resume.personalInfo.linkedin')}
+          </Label>
+          <Input
+            id="linkedin"
+            value={data.linkedin || ''}
+            onChange={(e) => handleChange('linkedin', e.target.value)}
+            placeholder={t('builder.personalInfoForm.placeholders.linkedin')}
+            className="rounded-none border-black focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-700 bg-transparent"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label
+            htmlFor="github"
+            className="font-mono text-xs uppercase tracking-wider text-steel-grey"
+          >
+            {t('resume.personalInfo.github')}
+          </Label>
+          <Input
+            id="github"
+            value={data.github || ''}
+            onChange={(e) => handleChange('github', e.target.value)}
+            placeholder={t('builder.personalInfoForm.placeholders.github')}
             className="rounded-none border-black focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-700 bg-transparent"
           />
         </div>
