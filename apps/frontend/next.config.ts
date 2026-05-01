@@ -5,7 +5,7 @@ const BACKEND_ORIGIN = process.env.BACKEND_ORIGIN || 'http://127.0.0.1:8000';
 const nextConfig: NextConfig = {
   output: 'standalone',
   experimental: {
-    proxyTimeout: 240_000,
+    proxyTimeout: 1_920_000, // 32 min — must exceed backend's 1800s hard limit for slow CPU/local models
     // Tree-shake barrel imports — saves ~200-800ms cold start per route
     optimizePackageImports: [
       'lucide-react',

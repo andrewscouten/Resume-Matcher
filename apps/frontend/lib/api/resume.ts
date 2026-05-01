@@ -117,24 +117,86 @@ async function postImprove(
 ): Promise<ImprovedResult> {
   let response: Response;
   try {
-    response = await apiPost(endpoint, payload, 240_000);
+    response = await apiPost(endpoint, payload, 1_800_000);
   } catch (networkError) {
     console.error(`Network error during ${endpoint}:`, networkError);
     throw networkError;
   }
 
-  const text = await response.text();
   if (!response.ok) {
+    const text = await response.text().catch(() => '');
     console.error('Improve failed response body:', text);
     throw new Error(`Improve failed with status ${response.status}: ${text}`);
   }
 
+  // /improve/preview uses SSE to send keep-alive pings while the LLM runs,
+  // preventing the Next.js dev-server proxy from killing the idle socket.
+  const contentType = response.headers.get('content-type') ?? '';
+  if (contentType.includes('text/event-stream')) {
+    return _readImproveSSE(response);
+  }
+
+  const text = await response.text();
   try {
     return JSON.parse(text) as ImprovedResult;
   } catch (parseError) {
     console.error('Failed to parse improve response:', parseError, 'Raw response:', text);
     throw parseError;
   }
+}
+
+/**
+ * Read an SSE stream produced by /improve/preview.
+ * Ignores ": keep-alive" comments; returns the parsed JSON from the data event.
+ */
+async function _readImproveSSE(response: Response): Promise<ImprovedResult> {
+  const reader = response.body!.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+
+      // SSE events are delimited by blank lines (\n\n)
+      const events = buffer.split('\n\n');
+      buffer = events.pop() ?? '';
+
+      for (const event of events) {
+        const trimmed = event.trim();
+        if (!trimmed || trimmed.startsWith(':')) continue; // keep-alive / comment
+
+        if (trimmed.startsWith('data: ')) {
+          const data = trimmed.slice(6).trim();
+          if (!data || data === '[DONE]') continue;
+
+          const parsed = JSON.parse(data) as Record<string, unknown>;
+          if (parsed.__error__) {
+            throw new Error(String(parsed.__error__));
+          }
+          return parsed as unknown as ImprovedResult;
+        }
+      }
+    }
+
+    // Handle any data remaining in buffer without a trailing \n\n
+    const tail = buffer.trim();
+    if (tail.startsWith('data: ')) {
+      const data = tail.slice(6).trim();
+      if (data && data !== '[DONE]') {
+        const parsed = JSON.parse(data) as Record<string, unknown>;
+        if (parsed.__error__) throw new Error(String(parsed.__error__));
+        return parsed as unknown as ImprovedResult;
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  throw new Error('SSE stream ended without a result');
 }
 
 /** Uploads job descriptions and returns a job_id */
