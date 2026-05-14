@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Resume, { ResumeData } from '@/components/dashboard/resume-component';
 import {
   type TemplateType,
@@ -14,6 +15,8 @@ import { API_BASE } from '@/lib/api/client';
 import { translate } from '@/lib/i18n/server';
 import { resolveLocale } from '@/lib/i18n/locale';
 import { withLocalizedDefaultSections } from '@/lib/utils/section-helpers';
+
+export const metadata: Metadata = { title: '' };
 
 type PageProps = {
   params: Promise<{ id: string }>;

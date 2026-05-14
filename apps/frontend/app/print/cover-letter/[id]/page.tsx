@@ -5,9 +5,12 @@
  * Uses the same API fetch pattern as the resume print page.
  */
 
+import type { Metadata } from 'next';
 import { API_BASE } from '@/lib/api/client';
 import { translate } from '@/lib/i18n/server';
 import { resolveLocale } from '@/lib/i18n/locale';
+
+export const metadata: Metadata = { title: '' };
 
 const PAGE_DIMENSIONS = {
   A4: { width: 210, height: 297 },
