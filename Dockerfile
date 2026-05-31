@@ -21,7 +21,7 @@ COPY apps/frontend/package*.json ./
 # (~100 MB each). Next.js falls back to its built-in WASM compiler automatically.
 # lightningcss native binary is required by Tailwind CSS v4 (no fallback) so we
 # reinstall it specifically for the current architecture.
-RUN npm ci --omit=optional \
+RUN npm install --omit=optional \
     && LCSS_VER=$(node -p "require('./node_modules/lightningcss/package.json').version") \
     && case "$(uname -m)" in \
          x86_64)  LCSS_PKG="lightningcss-linux-x64-gnu"  ;; \
