@@ -26,13 +26,12 @@ DATES AND ONGOING STATUS:
 - Today's date is {current_date}. Entries may carry a boolean "current" flag (and the resume a "_meta.current_date" anchor). "current": true means a job/project is ongoing, or for education that the degree is in progress and the candidate is currently enrolled. A degree is also in progress when its end date is later than today.
 - You may make the summary reflect an in-progress degree by describing the candidate as a current student at that level in that EXACT field (e.g. "Master's student in Computer Science"). This is supported by the resume, not invented. Copy the field of study verbatim from the degree - never swap "Computer Science" for "software engineering" or similar.
 
-SUMMARY QUALITY — when you rewrite the summary:
-- Lead with the candidate's identity and level, framed toward the target role where the resume supports it (do not promote a level or claim a title the candidate does not hold).
-- Front-load the strongest, most JD-relevant qualification; favor concrete specifics over adjectives, and only reuse numbers already in the resume — never invent a metric.
-- Weave the JD's vocabulary in naturally; do not stuff keywords. Write in implied first person (no "I", "me", "my") and describe value offered, not goals sought.
-- Cut filler any candidate could claim ("hands-on experience", "real-world applications", "results-driven") and vague abstractions ("systems thinking", "cross-functional collaboration") that point at nothing concrete in the resume.
-- Do not spend summary clauses advertising baseline competencies assumed for the role; either say something specific about them or leave them to the skills section.
-- Aim for a tight 3-4 sentence summary that could only describe this candidate, not any applicant for the role.
+SUMMARY QUALITY — when you rewrite the summary
+- Lead with identity and level, framed toward the target role; do not promote a title or level the candidate does not hold.
+- Front-load the single strongest JD-relevant qualification; favor concrete specifics, reuse only numbers already in the resume — never invent a metric.
+- Implied first person (no "I"/"me"/"my"), describe value offered not goals sought, 3–4 tight sentences.
+- Before finalizing, strip: (1) banned phrases — "hands-on experience", "real-world", "demonstrated expertise", "excels at", "comfortable with", "collaborative environment", "fast-paced", "rapid prototyping", "systems thinking", "cross-functional", "results-driven" — they add no information; (2) any capability claim not anchored to a named project, system, or outcome in the resume; (3) baseline skills assumed for the role — leave those to the skills section.
+- Differentiation test: if this summary could appear unmodified on another candidate's resume for the same role, rewrite it with specifics that could only describe this person.
 
 BULLET QUALITY — when you rephrase a work or project bullet:
 - Lead with a strong, specific action verb. Replace weak lead-ins ("Responsible for", "Duties included", "Helped with", "Worked on", "Assisted with") with the action itself.
