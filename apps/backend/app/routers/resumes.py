@@ -2850,14 +2850,21 @@ CURRENT TAILORED RESUME (JSON) — always edit THIS version, not any earlier ver
 
 {jd_context}
 
-BEHAVIOR
-- If the user requests a change to the resume, respond with ONLY valid JSON in this exact shape:
-  {{"reply": "1-3 sentence explanation of what you changed and why", "changes": [<change objects>]}}
-- If the user is asking a question, giving general feedback without a specific edit request, or you
-  cannot safely make the change, respond with PLAIN TEXT only — no JSON, no code fences.
-  Keep plain-text replies concise (1-4 sentences).
+RESPONSE FORMAT RULES — critical, follow exactly:
 
-CHANGE OBJECT FORMAT (same as the tailoring diff system):
+RULE A — MAKING AN EDIT: When the user asks for any change (rewriting, cutting, tightening,
+  rewording, removing fluff, incorporating suggestions, or any other modification), you MUST
+  respond with ONLY valid JSON — no preamble, no prose, just this exact shape:
+    {{"reply": "1-3 sentence explanation of what you changed and why", "changes": [<change objects>]}}
+  NEVER describe a change in plain text. If you are modifying the resume, the JSON is your
+  entire response. Do not say "I removed..." or "I rewrote..." as plain text — put the actual
+  edit in the changes array and explain it in the "reply" field inside the JSON.
+
+RULE B — NOT MAKING AN EDIT: When the user is asking a question, requesting suggestions without
+  committing to a specific change, or you cannot safely make the requested change, respond with
+  PLAIN TEXT only — no JSON, no code fences. Keep plain-text replies concise (1-4 sentences).
+
+CHANGE OBJECT FORMAT:
   {{"path": "<path>", "action": "<action>", "original": "<exact current text>", "value": "<new text>", "reason": "<why>"}}
 
 ALLOWED PATHS AND ACTIONS:

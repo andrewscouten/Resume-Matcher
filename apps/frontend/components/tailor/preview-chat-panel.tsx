@@ -10,6 +10,7 @@ import {
   type RefineChatResponse,
 } from '@/lib/api/resume';
 import type { ResumeData } from '@/components/dashboard/resume-component';
+import type { ResumeFieldDiff } from '@/components/common/resume_previewer_context';
 import { useTranslations } from '@/lib/i18n';
 
 interface PreviewChatPanelProps {
@@ -23,6 +24,7 @@ interface ChatEntry {
   role: 'user' | 'assistant';
   content: string;
   isError?: boolean;
+  detailed_changes?: ResumeFieldDiff[];
 }
 
 /**
@@ -70,7 +72,11 @@ export function PreviewChatPanel({
         history,
       });
 
-      const assistantEntry: ChatEntry = { role: 'assistant', content: response.reply };
+      const assistantEntry: ChatEntry = {
+        role: 'assistant',
+        content: response.reply,
+        detailed_changes: response.detailed_changes ?? undefined,
+      };
       setDisplayEntries((prev) => [...prev, assistantEntry]);
       setHistory((prev) => [...prev, { role: 'assistant', content: response.reply }]);
 
@@ -124,7 +130,7 @@ export function PreviewChatPanel({
           >
             <div
               className={[
-                'max-w-[85%] px-3 py-2 font-mono text-xs leading-relaxed',
+                'max-w-[90%] px-3 py-2 font-mono text-xs leading-relaxed',
                 entry.role === 'user'
                   ? 'bg-primary text-on-accent border border-black'
                   : entry.isError
@@ -133,6 +139,34 @@ export function PreviewChatPanel({
               ].join(' ')}
             >
               {entry.content}
+              {entry.detailed_changes && entry.detailed_changes.length > 0 && (
+                <div className="mt-2 pt-2 border-t border-black/20 space-y-2">
+                  {entry.detailed_changes.map((change, j) => (
+                    <div key={j}>
+                      <div className="text-[10px] uppercase tracking-wider text-steel-grey mb-1">
+                        {change.field_type}
+                        {change.change_type === 'modified'
+                          ? ' updated'
+                          : change.change_type === 'added'
+                            ? ' added'
+                            : ' removed'}
+                      </div>
+                      {change.original_value && (
+                        <div className="px-2 py-1 bg-red-50 border-l-2 border-red-400 text-red-800 leading-snug whitespace-pre-wrap">
+                          {'− '}
+                          {change.original_value}
+                        </div>
+                      )}
+                      {change.new_value && (
+                        <div className="px-2 py-1 bg-green-50 border-l-2 border-green-500 text-green-800 leading-snug whitespace-pre-wrap">
+                          {'+ '}
+                          {change.new_value}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         ))}
