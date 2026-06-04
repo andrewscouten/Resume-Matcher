@@ -111,6 +111,7 @@ _BLOCKED_FIELD_NAMES = frozenset({
     "website",
     "location",
     "id",
+    "context",  # User-authored AI context — never modified by the model
 })
 
 _METRIC_RE = re.compile(r"\d+%|\d+x|\$\d+")

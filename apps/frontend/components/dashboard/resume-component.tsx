@@ -35,6 +35,8 @@ export interface Experience {
   // Metadata only: marks the role as ongoing. Never rendered on the resume.
   current?: boolean;
   description?: string[];
+  // Metadata only: user-authored AI context. Never rendered; never modified by the model.
+  context?: string;
 }
 
 export interface Education {
@@ -57,6 +59,8 @@ export interface Project {
   github?: string;
   website?: string;
   description?: string[];
+  // Metadata only: user-authored AI context. Never rendered; never modified by the model.
+  context?: string;
 }
 
 export interface AdditionalInfo {

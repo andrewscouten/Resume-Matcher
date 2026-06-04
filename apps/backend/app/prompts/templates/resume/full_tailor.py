@@ -82,7 +82,7 @@ PATHS you can target
 - "additional.technicalSkills" - reorder the list (action: "reorder"), add one verified skill (action: "add_skill"), rename an existing skill (action: "rename_skill"), or remove an irrelevant skill (action: "remove_skill")
 
 SKILL ACTION DETAILS
-- "reorder": value = full reordered list. Cluster topically related skills adjacent (languages together, frameworks together, databases together, infra/tooling together). Lead each cluster with the most JD-relevant entries. No category labels in the list itself.
+- "reorder": value = full reordered list. Cluster topically related skills adjacent (languages together, frameworks together, databases together, infra/tooling together). Lead each cluster with the most JD-relevant entries; when relevance is equal, order by depth of use. No category labels in the list itself.
 - "add_skill": value = new skill (must appear in Verified skill targets). Include "insert_after" naming a topically adjacent existing skill. Omit only if no related skill exists.
 - "rename_skill": original = existing skill exactly; value = verified-target replacement (must be a clear generalization/specialization/synonym).
 - "remove_skill": original = existing skill exactly; value = null. Use sparingly.

@@ -151,6 +151,10 @@ class Experience(BaseModel):
     # layer so the model can reason about ongoing vs. completed roles.
     current: bool = False
     description: list[str] = Field(default_factory=list)
+    # User-authored AI context: background, constraints, stories, or nuance the
+    # candidate wants the model to reason from. Never rendered on the resume;
+    # never modified by the model — only the user edits this field.
+    context: str | None = None
 
     @field_validator("description", mode="before")
     @classmethod
@@ -191,6 +195,10 @@ class Project(BaseModel):
     github: str | None = None
     website: str | None = None
     description: list[str] = Field(default_factory=list)
+    # User-authored AI context: background, constraints, stories, or nuance the
+    # candidate wants the model to reason from. Never rendered on the resume;
+    # never modified by the model — only the user edits this field.
+    context: str | None = None
 
     @field_validator("description", mode="before")
     @classmethod

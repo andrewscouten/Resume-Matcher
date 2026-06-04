@@ -14,6 +14,7 @@ WEAK DESCRIPTION INDICATORS:
 4. No technologies/tools: Missing specific tech stack, tools, or methodologies used
 5. Passive voice without ownership: Not clear what the candidate personally accomplished
 6. Too brief: Single short bullet that doesn't explain the work
+7. Missing link (projects only): Project entry has no GitHub repository or live demo URL
 
 GOOD DESCRIPTION EXAMPLES (for reference):
 - "Led migration of 15 microservices to Kubernetes, reducing deployment time by 60%"
@@ -23,10 +24,9 @@ GOOD DESCRIPTION EXAMPLES (for reference):
 TASK:
 1. Review each Experience and Project item's description bullets
 2. Identify items that would benefit from more detail
-3. Generate a MAXIMUM of 6 questions total across ALL items (not per item)
-4. Prioritize the most impactful questions that will yield the best improvements
-5. If multiple items need enhancement, distribute questions wisely (e.g., 2-3 per item)
-6. Questions should help extract: metrics, technologies, scope, impact, and specific contributions
+3. Prioritize the most impactful questions that will yield the best improvements
+4. If multiple items need enhancement, distribute questions wisely (e.g., 2-3 per item)
+5. Questions should help extract: metrics, technologies, scope, impact, and specific contributions
 
 OUTPUT FORMAT (JSON only, no other text):
 {{
@@ -79,4 +79,5 @@ IMPORTANT RULES:
 - Questions should be specific to the role/project context
 - Keep questions conversational but professional
 - Placeholder text should give concrete examples
-- Prioritize quality over quantity - ask the most impactful questions first"""
+- Prioritize quality over quantity - ask the most impactful questions first
+- For project entries missing a URL: ask for a GitHub or demo link as the lowest-priority question (only if question slots remain); example: "Does this project have a GitHub repository or live demo? Recruiters actively click these links." with placeholder "e.g., https://github.com/yourname/project-name""""

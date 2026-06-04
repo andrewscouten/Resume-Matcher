@@ -232,6 +232,25 @@ export const ProjectsForm: React.FC<ProjectsFormProps> = ({ data, onChange }) =>
                 description={t('builder.genericItemForm.fields.ongoingHint')}
               />
             </div>
+
+            <div className="mt-4 border border-dashed border-black bg-white p-3">
+              <Label className="font-mono text-xs uppercase tracking-wider text-steel-grey block mb-1">
+                {t('builder.genericItemForm.fields.context')}
+              </Label>
+              <p className="font-mono text-xs text-steel-grey mb-2">
+                {t('builder.genericItemForm.fields.contextHint')}
+              </p>
+              <textarea
+                value={item.context ?? ''}
+                onChange={(e) => handleChange(item.id, 'context', e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') e.stopPropagation();
+                }}
+                placeholder={t('builder.genericItemForm.placeholders.context')}
+                rows={3}
+                className="w-full font-mono text-sm border border-black bg-white resize-y p-2 focus:outline-none focus:ring-1 focus:ring-black placeholder:text-steel-grey"
+              />
+            </div>
           </div>
         ))}
 

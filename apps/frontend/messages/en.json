@@ -315,7 +315,9 @@
         "years": "Years",
         "descriptionPoints": "Description Points",
         "current": "Current",
-        "ongoingHint": "Metadata only — does not change your resume"
+        "ongoingHint": "Metadata only — does not change your resume",
+        "context": "AI Context",
+        "contextHint": "Metadata only — provides context to AI, never shown on resume, never changed by AI"
       },
       "actions": {
         "addPoint": "Add Point"
@@ -325,7 +327,8 @@
         "organization": "Organization",
         "location": "Location",
         "years": "Jan 2020 - Present",
-        "description": "Describe your contribution..."
+        "description": "Describe your contribution...",
+        "context": "Background, constraints, stories, or nuance for the AI to reason from..."
       },
       "noEntries": "// NO {label} ENTRIES",
       "addFirstItem": "Add First {label}"

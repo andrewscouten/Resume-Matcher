@@ -22,6 +22,7 @@ New bullets should be:
 3. Technically specific: Mention technologies, tools, and methodologies
 4. Impact-focused: Clearly state the business or technical outcome
 5. Ownership-clear: Show what the candidate personally did vs. the team
+6. Varied: Do not begin a new bullet with the same opening verb as an adjacent bullet in the entry
 
 OUTPUT FORMAT (JSON only, no other text):
 {{

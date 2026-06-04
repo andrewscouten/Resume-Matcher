@@ -315,7 +315,9 @@
         "years": "期間",
         "descriptionPoints": "説明ポイント",
         "current": "現在",
-        "ongoingHint": "メタデータのみ — 履歴書は変更されません"
+        "ongoingHint": "メタデータのみ — 履歴書は変更されません",
+        "context": "AIコンテキスト",
+        "contextHint": "メタデータのみ — AIに背景情報を提供します。履歴書には表示されず、AIによって変更されません"
       },
       "actions": {
         "addPoint": "ポイントを追加"
@@ -325,7 +327,8 @@
         "organization": "組織",
         "location": "場所",
         "years": "2020年1月 - 現在",
-        "description": "あなたの貢献を説明..."
+        "description": "あなたの貢献を説明...",
+        "context": "AIが推論するための背景、制約、エピソード、ニュアンスなど..."
       },
       "noEntries": "// {label} の項目はありません",
       "addFirstItem": "最初の{label}を追加"

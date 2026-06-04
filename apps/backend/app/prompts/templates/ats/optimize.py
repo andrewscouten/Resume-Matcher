@@ -25,8 +25,6 @@ Score Breakdown: {score_breakdown}
 
 Optimization rules:
 - Weave missing keywords into existing bullets ONLY where the candidate's actual experience supports them
-- If the resume contains any of these exact phrases — "product judgment", "operating in ambiguity", "structured thinking", "data-driven decision making" — preserve them verbatim in the output
-- Do NOT add those PM phrases if they do not appear anywhere in the original resume text
 - Strengthen vague action verbs ("worked on" → "led", "helped with" → "drove")
 - Improve the summary to lead with the most JD-relevant experience
 - Provide 5-10 specific, actionable optimization_suggestions explaining what changed and why

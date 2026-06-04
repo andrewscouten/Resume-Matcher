@@ -315,7 +315,9 @@
         "years": "时间",
         "descriptionPoints": "描述要点",
         "current": "当前",
-        "ongoingHint": "仅元数据 — 不会更改你的简历"
+        "ongoingHint": "仅元数据 — 不会更改你的简历",
+        "context": "AI 背景信息",
+        "contextHint": "仅元数据 — 为 AI 提供背景信息，不显示在简历中，不会被 AI 修改"
       },
       "actions": {
         "addPoint": "添加要点"
@@ -325,7 +327,8 @@
         "organization": "组织/公司",
         "location": "地点",
         "years": "2020年1月 - 至今",
-        "description": "描述你的贡献..."
+        "description": "描述你的贡献...",
+        "context": "为 AI 推理提供背景、限制条件、故事或细节..."
       },
       "noEntries": "// 暂无{label}",
       "addFirstItem": "添加第一条{label}"

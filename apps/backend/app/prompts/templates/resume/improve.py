@@ -30,7 +30,7 @@ SUMMARY QUALITY — when you rewrite the summary
 - Lead with identity and level, framed toward the target role; do not promote a title or level the candidate does not hold.
 - Front-load the single strongest JD-relevant qualification; favor concrete specifics, reuse only numbers already in the resume — never invent a metric.
 - Implied first person (no "I"/"me"/"my"), describe value offered not goals sought, 3–4 tight sentences.
-- Before finalizing, strip: (1) banned phrases — "hands-on experience", "real-world", "demonstrated expertise", "excels at", "comfortable with", "collaborative environment", "fast-paced", "rapid prototyping", "systems thinking", "cross-functional", "results-driven" — they add no information; (2) any capability claim not anchored to a named project, system, or outcome in the resume; (3) baseline skills assumed for the role — leave those to the skills section.
+- Before finalizing, strip: (1) banned phrases — "hands-on experience", "real-world", "demonstrated expertise", "proven track record", "results-driven", "passionate about", "excels at", "strong background in", "comfortable with", "comfortable working remotely", "collaborative environment", "fast-paced", "rapid prototyping", "iterative refinement", "systems thinking", "cross-functional" — they add no information; (2) any capability claim not anchored to a named project, system, or outcome in the resume; (3) baseline skills assumed for the role — leave those to the skills section.
 - Differentiation test: if this summary could appear unmodified on another candidate's resume for the same role, rewrite it with specifics that could only describe this person.
 
 BULLET QUALITY — when you rephrase a work or project bullet:
@@ -38,6 +38,7 @@ BULLET QUALITY — when you rephrase a work or project bullet:
 - Favor an action + result shape: name what was done and the outcome or impact it produced, not just the task. Make the "so what" explicit wherever the original supports it.
 - Surface concrete scope, scale, volume, or frequency the resume already shows; never invent a metric (see rule 2). If no number is supported, state the scope in words.
 - Use active voice and implied first person with no pronouns ("Led X", not "I led X" and not the passive "X was led"). Keep past tense for completed roles and present tense for a current/ongoing role, consistent within each entry.
+- Vary the opening verb across bullets within the same entry; do not repeat the same opening verb on consecutive bullets.
 - Cut filler ("various tasks", "as needed", "fast-paced environment") and contextless adjectives. Keep each bullet to one or two lines.
 
 PATHS you can target:
@@ -46,7 +47,7 @@ PATHS you can target:
 - "workExperience[i].description" — append a new bullet (action: "append")
 - "personalProjects[i].description[j]" — a specific project bullet
 - "personalProjects[i].description" — append a new project bullet
-- "additional.technicalSkills" — reorder the skills list (action: "reorder") or add one verified skill (action: "add_skill"). When reordering, cluster topically related skills adjacent to each other (you choose the clusters based on the skills present, e.g. languages together, frameworks together, databases together) and lead each cluster with its most JD-relevant entries.
+- "additional.technicalSkills" — reorder the skills list (action: "reorder") or add one verified skill (action: "add_skill"). When reordering, cluster topically related skills adjacent to each other (you choose the clusters based on the skills present, e.g. languages together, frameworks together, databases together) and lead each cluster with its most JD-relevant entries; when relevance is equal, order by depth of use.
 
 Do NOT target: personalInfo, dates/years, company names, education, customSections.
 

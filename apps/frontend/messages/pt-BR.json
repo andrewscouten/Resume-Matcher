@@ -315,7 +315,9 @@
         "years": "Período",
         "descriptionPoints": "Pontos de Descrição",
         "current": "Atual",
-        "ongoingHint": "Apenas metadados — não altera seu currículo"
+        "ongoingHint": "Apenas metadados — não altera seu currículo",
+        "context": "Contexto de IA",
+        "contextHint": "Apenas metadados — fornece contexto para a IA, nunca exibido no currículo, nunca alterado pela IA"
       },
       "actions": {
         "addPoint": "Adicionar Ponto"
@@ -325,7 +327,8 @@
         "organization": "Organização",
         "location": "Localização",
         "years": "Jan 2020 - Presente",
-        "description": "Descreva sua contribuição..."
+        "description": "Descreva sua contribuição...",
+        "context": "Contexto, restrições, histórias ou nuances para a IA raciocinar..."
       },
       "noEntries": "// NENHUMA ENTRADA DE {label}",
       "addFirstItem": "Adicionar Primeira {label}"
