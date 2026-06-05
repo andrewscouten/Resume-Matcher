@@ -80,4 +80,4 @@ IMPORTANT RULES:
 - Keep questions conversational but professional
 - Placeholder text should give concrete examples
 - Prioritize quality over quantity - ask the most impactful questions first
-- For project entries missing a URL: ask for a GitHub or demo link as the lowest-priority question (only if question slots remain); example: "Does this project have a GitHub repository or live demo? Recruiters actively click these links." with placeholder "e.g., https://github.com/yourname/project-name""""
+- For project entries missing a URL: ask for a GitHub or demo link as the lowest-priority question (only if question slots remain); example: "Does this project have a GitHub repository or live demo? Recruiters actively click these links." with placeholder "e.g., https://github.com/yourname/project-name\""""
