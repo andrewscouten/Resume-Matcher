@@ -10,7 +10,8 @@ Rules:
 3. You may include JD skills that are missing from the resume skills list.
 4. Do not include skills unrelated to the JD.
 5. Do not include certifications.
-6. Generate reasons in {output_language}.
+6. Only include concrete, nameable skills: programming languages, frameworks, libraries, tools, software, platforms, or specific technologies (e.g. "PostgreSQL", "React", "Docker"). Do NOT include vague categories or soft skills such as "Relational Databases", "Problem Solving", "Communication", "Teamwork", or "Critical Thinking". When the JD references a broad category, map it to the concrete technology the candidate actually uses (e.g. "Relational Databases" -> "PostgreSQL").
+7. Generate reasons in {output_language}.
 
 Existing resume skills:
 {existing_skills}
