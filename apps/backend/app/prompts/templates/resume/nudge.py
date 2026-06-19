@@ -18,14 +18,27 @@ RULES:
 8. Do not use em dash characters
 9. Keep changes minimal and targeted — do not rewrite content that already aligns well
 10. Exception to rule 2: you may add a skill only if it appears in the verified skill targets below
+11. Preserve all hyperlinks verbatim. If the original text contains a markdown link ([text](url)), the rewritten value must include that exact link unchanged. Never drop, shorten, or alter a URL.
+
+WRITING STYLE — apply to all generated text (bullets, summary, reason fields, strategy_notes)
+- No em dashes.
+- No hollow openers: "Certainly!", "Sure!", "Absolutely!", "Great question!", or any similar affirmation.
+- No self-announcing meta-commentary: "Here's a clear, practical rundown:", "Short answer:", "Bottom line:", "Honestly,", "My honest take:", "Here's the thing:".
+- No "It's X, not Y" constructions.
+- Do not wrap rephrased ideas in unnecessary quotation marks (e.g., a "red flag" pattern).
+- No emojis.
+- Do not use filler transitions like "just", "simply", "basically", "literally" at the start of a phrase.
+- Prefer direct phrasing over stating what you are or are not going to do.
+- Banned summary/bullet phrases: "proven experience in", "proven track record", "hands-on experience", "hands-on expertise", "real-world", "demonstrated expertise", "results-driven", "passionate about", "excels at", "strong background in", "comfortable with", "fast-paced", "collaborative environment", "skilled at", "proficient in", "adept at", "well-versed in", "expertise in", "drive organizational decisions", "drive business outcomes", "ensuring accuracy and consistency", "for diverse audiences", "in a dynamic environment".
+- Empty intensifiers — delete adjectives that sound impressive but add no facts: "complex", "critical", "diverse", "large-scale", "comprehensive", "robust", "scalable", "innovative", "cutting-edge", "state-of-the-art", "advanced", "extensive", "significant", "key", "essential", "dynamic", "strategic", "sophisticated", "high-impact", "high-quality", "mission-critical". Replace with a specific detail from the resume or drop the word entirely.
 
 DATES AND ONGOING STATUS:
 - Today's date is {current_date}. Entries may carry a boolean "current" flag (and the resume a "_meta.current_date" anchor). "current": true means a job/project is ongoing, or for education that the degree is in progress and the candidate is currently enrolled. A degree is also in progress when its end date is later than today.
 - You may make the summary reflect an in-progress degree by describing the candidate as a current student at that level in that EXACT field (e.g. "Master's student in Computer Science"). This is supported by the resume, not invented. Copy the field of study verbatim from the degree - never swap "Computer Science" for "software engineering" or similar.
 
-SUMMARY QUALITY — if you rephrase the summary, improve it by subtraction: cut filler phrases ("hands-on experience", "real-world", "demonstrated expertise", "proven track record", "results-driven", "passionate about", "excels at", "strong background in", "comfortable with", "comfortable working remotely", "collaborative environment", "fast-paced", "rapid prototyping", "iterative refinement", "systems thinking", "cross-functional") and any claim not anchored to a named project, system, or outcome already in the resume. Do not add new claims; keep only what the resume already shows.
+SUMMARY QUALITY — if you rephrase the summary, improve it by subtraction: cut filler phrases ("proven experience in", "hands-on experience", "hands-on expertise", "real-world", "demonstrated expertise", "proven track record", "results-driven", "passionate about", "excels at", "strong background in", "comfortable with", "comfortable working remotely", "collaborative environment", "fast-paced", "rapid prototyping", "iterative refinement", "systems thinking", "cross-functional", "skilled at", "proficient in", "adept at", "well-versed in", "expertise in", "drive organizational decisions", "for diverse audiences"), cut empty intensifiers ("complex", "critical", "diverse", "large-scale", "comprehensive", "robust", "advanced", "extensive", "significant", "strategic", "sophisticated" — replace with a specific detail or drop), and cut any claim not anchored to a named project, system, or outcome already in the resume. Do not add new claims; keep only what the resume already shows.
 
-BULLET QUALITY — when you rephrase a bullet, improve it in place without adding claims: lead with a strong action verb and replace weak lead-ins ("Responsible for", "Duties included", "Helped with", "Worked on") with the action itself; prefer active voice and implied first person with no pronouns; keep past tense for completed roles and present tense for current ones; vary the opening verb across bullets within the same entry (do not repeat the same opening verb on consecutive bullets). Surface only scope or results the original already states — never add a metric or outcome that is not there.
+BULLET QUALITY — when you rephrase a bullet, improve it in place without adding claims: lead with a strong action verb and replace weak lead-ins ("Responsible for", "Duties included", "Helped with", "Worked on") with the action itself; prefer active voice and implied first person with no pronouns; keep past tense for completed roles and present tense for current ones; vary the opening verb across bullets within the same entry (do not repeat the same opening verb on consecutive bullets). Cut filler and empty intensifiers ("complex", "critical", "diverse", "large-scale", "comprehensive", "robust", "advanced", "significant", "key", "essential", "strategic") — replace with a concrete detail or drop entirely. Surface only scope or results the original already states — never add a metric or outcome that is not there.
 
 PATHS you can target:
 - "summary" — the resume summary text

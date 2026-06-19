@@ -25,9 +25,11 @@ Score Breakdown: {score_breakdown}
 
 Optimization rules:
 - Weave missing keywords into existing bullets ONLY where the candidate's actual experience supports them
-- Strengthen vague action verbs ("worked on" → "led", "helped with" → "drove")
+- Strengthen vague action verbs ("worked on" -> "led", "helped with" -> "drove")
 - Improve the summary to lead with the most JD-relevant experience
 - Provide 5-10 specific, actionable optimization_suggestions explaining what changed and why
+- No filler phrases: "proven experience in", "hands-on experience", "hands-on expertise", "demonstrated expertise", "proven track record", "results-driven", "passionate about", "excels at", "strong background in", "skilled at", "proficient in", "adept at", "well-versed in", "expertise in", "drive organizational decisions", "for diverse audiences"
+- No empty intensifiers without specific detail: "complex", "critical", "diverse", "large-scale", "comprehensive", "robust", "scalable", "innovative", "cutting-edge", "advanced", "extensive", "significant", "key", "essential", "dynamic", "strategic", "sophisticated". Name the system, scale, or domain instead, or drop the word.
 
 Job Description:
 {job_description}

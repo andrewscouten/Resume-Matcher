@@ -39,7 +39,9 @@ RULES:
 - Do NOT add any new facts, metrics, dates, companies, titles, or accomplishments that are not already present in CURRENT DESCRIPTION or USER'S FEEDBACK/INSTRUCTION
 - If the user asks for metrics but none exist in the provided text, do not fabricate numbers; rewrite to emphasize scope/impact qualitatively instead
 - Keep bullets concise (1-2 lines each)
-- Use past tense for past roles, present tense for current"""
+- Use past tense for past roles, present tense for current
+- No filler phrases: "proven experience in", "hands-on experience", "hands-on expertise", "demonstrated expertise", "proven track record", "results-driven", "passionate about", "excels at", "strong background in", "skilled at", "proficient in", "adept at", "well-versed in", "expertise in"
+- No empty intensifiers used without specific detail: "complex", "critical", "diverse", "large-scale", "comprehensive", "robust", "scalable", "innovative", "cutting-edge", "advanced", "extensive", "significant", "key", "essential", "dynamic", "strategic", "sophisticated". Name the system, scale, or domain instead, or drop the word."""
 
 
 ENRICHMENT_REGENERATE_SKILLS_PROMPT = """You are a professional resume writer. Rewrite the technical skills section based on user feedback.

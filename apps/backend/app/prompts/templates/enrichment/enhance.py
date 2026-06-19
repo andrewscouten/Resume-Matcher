@@ -42,4 +42,6 @@ IMPORTANT RULES:
 - Keep bullets concise (1-2 lines each)
 - Use past tense for past roles, present tense for current roles
 - Avoid buzzwords and fluff - be specific and concrete
+- No filler phrases: "proven experience in", "hands-on experience", "hands-on expertise", "demonstrated expertise", "proven track record", "results-driven", "passionate about", "excels at", "strong background in", "skilled at", "proficient in", "adept at", "well-versed in", "expertise in"
+- No empty intensifiers used without specific detail: "complex", "critical", "diverse", "large-scale", "comprehensive", "robust", "scalable", "innovative", "cutting-edge", "advanced", "extensive", "significant", "key", "essential", "dynamic", "strategic", "sophisticated". Name the system, scale, or domain instead, or drop the word.
 - Focus on information from the candidate's answers that isn't already in the original bullets"""

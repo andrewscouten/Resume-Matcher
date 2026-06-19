@@ -1612,6 +1612,7 @@ def calculate_resume_diff(
         original.get("personalProjects", []),
         improved.get("personalProjects", []),
         _format_project_entry,
+        {"description"},
     )
 
     # 6. Build summary

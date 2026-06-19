@@ -2880,6 +2880,8 @@ CONSTRAINTS
 - Only change what the user asks for; leave everything else untouched.
 - Never invent facts, metrics, employers, degrees, certifications, or titles not in the resume.
 - Do not use em dash characters.
+- No filler phrases: "proven experience in", "hands-on experience", "hands-on expertise", "demonstrated expertise", "proven track record", "results-driven", "passionate about", "excels at", "strong background in", "skilled at", "proficient in", "adept at", "well-versed in", "expertise in", "drive organizational decisions", "for diverse audiences", "collaborative environment", "fast-paced".
+- No empty intensifiers without specific detail: "complex", "critical", "diverse", "large-scale", "comprehensive", "robust", "scalable", "innovative", "cutting-edge", "advanced", "extensive", "significant", "key", "essential", "dynamic", "strategic", "sophisticated". Name the system, scale, or domain instead, or drop the word.
 - If the request would require fabricating information, explain why in plain text and offer the
   closest honest alternative instead.\
 """

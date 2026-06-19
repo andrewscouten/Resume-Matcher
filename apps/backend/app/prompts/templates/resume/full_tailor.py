@@ -16,11 +16,13 @@ RESUME_FULL_TAILOR_PROMPT = """Tailor this resume to the job description. Output
 FULL TAILOR MODE
 The user has opted in to bending the resume toward the job description. User guidance (if provided at the end of the prompt) is authoritative on voice, framing, tone, audience, and how aggressively to bend. Honor it.
 
+User guidance sets style and strategy — it is NOT evidence for attribution. If guidance mentions a skill or tool the candidate used in some other context (e.g., a class, a side project, a previous job), that does not make it attributable to a different work entry. Every skill or tool added to a specific entry must be supported by that entry's own content.
+
 WHAT YOU MAY DO
 - Rewrite bullets: change wording, voice, action verbs, sentence structure, and framing. Rewrites must REPLACE the original (action: "replace"). Never produce output that is the original text followed by additional clauses tacked on.
 - Add new bullets that elaborate on or reframe work the candidate actually did.
 - Reframe academic/research work in industry terms (or vice versa) when guidance supports it.
-- Include adjacent skills, tools, or vocabulary a candidate with this background would plausibly have. "Framing" means voice and emphasis, not relabeling what the work was (see PLAUSIBILITY FLOOR).
+- Use vocabulary and tool names that the entry itself already implies or evidences. Do not introduce a skill or tool into an entry based on the candidate's background elsewhere — attribution must trace to that entry's own existing content. "Framing" means voice and emphasis, not relabeling what the work was (see PLAUSIBILITY FLOOR).
 - Reframe the SUMMARY's lead identity when guidance signals a different audience or career stage. The lead noun is repositionable using framing supported by guidance and the resume. Do not invent a status not in the resume; an in-progress degree is a real status, not an invented one — see DATES AND ONGOING STATUS.
 - Rename an existing skill to a closely related verified target when the rename is a generalization, specialization, or near-synonym (e.g., "MySQL" -> "SQL"). Use action "rename_skill". Do not swap to an unrelated skill.
 - Remove an existing skill when it has no plausible relevance to the JD AND removing it does not strip credible coverage. Example: "Forklift Certified" on a Full-Stack Engineer resume. Use action "remove_skill".
@@ -33,21 +35,23 @@ BUILD:
 - Implied first person (no "I"/"me"/"my"), describe value offered not goals sought. One paragraph, 3–4 tight sentences.
 
 STRIP — run each check before finalizing:
-1. Banned phrases — delete any of these on sight: "hands-on experience", "real-world", "demonstrated expertise", "proven track record", "results-driven", "passionate about", "excels at", "strong background in", "comfortable with", "comfortable working remotely", "collaborative environment", "fast-paced", "rapid prototyping", "iterative refinement", "systems thinking", "cross-functional". They carry no information.
-2. Unanchored abstractions — cut any capability claim you cannot link to a named project, system, or outcome in the resume. If you cannot point to it, cut it.
-3. Table stakes — do not claim baseline skills assumed for the role. Say something specific about depth or scale, or leave it to the skills section.
-4. Differentiation test — could this summary appear unmodified on another candidate's resume for the same role? If yes, rewrite using specifics that could only describe this person.
+1. Banned phrases — delete any of these on sight: "proven experience in", "hands-on experience", "hands-on expertise", "real-world", "demonstrated expertise", "proven track record", "results-driven", "passionate about", "excels at", "strong background in", "comfortable with", "comfortable working remotely", "collaborative environment", "fast-paced", "rapid prototyping", "iterative refinement", "systems thinking", "cross-functional", "skilled at", "proficient in", "adept at", "well-versed in", "expertise in", "drive organizational decisions", "drive business outcomes", "ensuring accuracy and consistency", "for diverse audiences", "in a dynamic environment". They carry no information.
+2. Empty intensifiers — delete adjectives that sound impressive but add no facts: "complex", "critical", "diverse", "large-scale", "comprehensive", "robust", "scalable", "innovative", "cutting-edge", "state-of-the-art", "advanced", "extensive", "significant", "key", "essential", "dynamic", "strategic", "sophisticated", "high-impact", "high-quality", "mission-critical". Replace with a specific detail from the resume (name the system, the scale, the domain) or drop the word entirely.
+3. Unanchored abstractions — cut any capability claim you cannot link to a named project, system, or outcome in the resume. If you cannot point to it, cut it.
+4. Table stakes — do not claim baseline skills assumed for the role. Say something specific about depth or scale, or leave it to the skills section.
+5. Differentiation test — could this summary appear unmodified on another candidate's resume for the same role? If yes, rewrite using specifics that could only describe this person.
 
 BULLET QUALITY — when you rewrite or add a work/project bullet
 - Lead with a strong, specific action verb (Built, Led, Designed, Shipped, Automated, Reduced). Never open with "Responsible for", "Duties included", "Helped with", "Worked on", or "Assisted with".
 - Action + what + result: name what was done and the outcome it produced. Make the "so what" explicit wherever the resume supports it.
 - Quantify with scope, scale, or frequency already in the resume. Never invent a number; if none is supported, describe scope in words.
 - Active voice, implied first person, no pronouns. Past tense for completed roles, present tense for current. One to two lines per bullet.
-- No filler ("various tasks", "as needed", "fast-paced"). Every claim must point at real work.
+- No filler ("various tasks", "as needed", "fast-paced") and no empty intensifiers ("complex", "critical", "diverse", "large-scale", "comprehensive", "robust", "advanced", "significant", "key", "essential", "strategic"). Replace with a concrete detail or drop entirely. Every claim must point at real work.
 - Vary the opening verb across bullets within an entry.
 
 PLAUSIBILITY FLOOR — NEVER CROSS
-- Test every JD keyword: could the work the resume explicitly describes plausibly HAVE BEEN or USED this keyword? INCLUDE it when the keyword is a mainstream instance, tool, or method of work already described (e.g. a resume stating "object detection" may name "YOLO"). Do NOT apply it when the keyword denotes a different CATEGORY of work — e.g. single-machine multithreaded code is not "distributed systems" and must not be relabeled as such. You may rewrite voice, verbs, and emphasis freely; you may not recharacterize the category of work. When a keyword fails the test, describe the work accurately and let the mismatch stand.
+- The plausibility test is per entry. A skill or tool may only be introduced into a work or project bullet if the content of THAT entry already describes work that implies or uses it. Do not use skills or tools mentioned in user guidance, other resume sections, or other entries as evidence for attribution here. Example: if guidance notes the candidate used SQL in a class, that fact does not justify adding SQL to a work experience entry where SQL was not used.
+- Test every JD keyword: could the work THIS ENTRY explicitly describes plausibly HAVE BEEN or USED this keyword? INCLUDE it when the keyword is a mainstream instance, tool, or method of work already described in that entry (e.g. a bullet stating "object detection" may name "YOLO"). Do NOT apply it when the keyword denotes a different CATEGORY of work — e.g. single-machine multithreaded code is not "distributed systems" and must not be relabeled as such. You may rewrite voice, verbs, and emphasis freely; you may not recharacterize the category of work. When a keyword fails the test, describe the work accurately and let the mismatch stand.
 - Do not claim experience in a domain the candidate has no demonstrated footing in.
 - Do not invent specific numeric metrics not in the original. Vague qualitative claims are fine; fabricated numbers are not.
 - Do not invent named products, companies, certifications, degrees, or employers.
@@ -72,6 +76,17 @@ FORMAT RULES
 - Generate all new text in {output_language}.
 - Do not use em dash characters.
 - For skills: only add a skill that appears in the verified skill targets below.
+- Preserve all hyperlinks verbatim. If the original text contains a markdown link ([text](url)), the rewritten value must include that exact link unchanged. Never drop, shorten, or alter a URL.
+
+WRITING STYLE — apply to all generated text (bullets, summary, reason fields, strategy_notes)
+- No em dashes.
+- No hollow openers: "Certainly!", "Sure!", "Absolutely!", "Great question!", or any similar affirmation.
+- No self-announcing meta-commentary: "Here's a clear, practical rundown:", "Short answer:", "Bottom line:", "Honestly,", "My honest take:", "Here's the thing:".
+- No "It's X, not Y" constructions.
+- Do not wrap rephrased ideas in unnecessary quotation marks (e.g., a "red flag" pattern).
+- No emojis.
+- Do not use filler transitions like "just", "simply", "basically", "literally" at the start of a phrase.
+- Prefer direct phrasing over stating what you are or are not going to do.
 
 PATHS you can target
 - "summary" - the resume summary text
