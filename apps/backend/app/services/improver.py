@@ -401,6 +401,12 @@ def apply_diffs(
                 logger.info("Diff rejected (rename_skill missing labels): %s", path)
                 rejected.append(change)
                 continue
+            if _normalize_skill_key(old_label) == _normalize_skill_key(new_label):
+                # No-op rename (identical / case- or whitespace-only change) would
+                # surface as a misleading "modified X → X" diff hunk.
+                logger.info("Diff rejected (rename_skill no-op): %s", old_label)
+                rejected.append(change)
+                continue
             old_key = old_label.casefold()
             new_key = new_label.casefold()
             match_index = -1
