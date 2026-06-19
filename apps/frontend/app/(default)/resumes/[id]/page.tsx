@@ -101,6 +101,7 @@ export default function ResumeViewerPage() {
   const [showDownloadSuccessDialog, setShowDownloadSuccessDialog] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [showEnrichmentModal, setShowEnrichmentModal] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isDownloadingJson, setIsDownloadingJson] = useState(false);
@@ -390,8 +391,24 @@ export default function ResumeViewerPage() {
       setOutreachMessage(data.outreach_message ?? null);
       setResumeDocId(data.resume_doc_id ?? null);
       setCvDocId(data.cv_doc_id ?? null);
+      return data;
     } catch (err) {
       console.error('Failed to reload resume:', err);
+      return null;
+    }
+  };
+
+  // After a chat edit applies to the saved document, refresh the live preview.
+  // In edit mode the preview renders the local draft, so reloading the view
+  // data alone isn't enough — sync the active draft from the fresh server data.
+  const handleChatDocumentChanged = async () => {
+    const data = await reloadResumeData();
+    if (!data) return;
+    if (isEditingResume && data.processed_resume) {
+      setResumeDraft(data.processed_resume as ResumeData);
+    }
+    if (isEditingCoverLetter) {
+      setCoverLetterDraft(data.cover_letter ?? '');
     }
   };
 
@@ -989,7 +1006,10 @@ export default function ResumeViewerPage() {
     (activeTab === 'resume' || activeTab === 'cv' || activeTab === 'coverLetter');
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div
+      data-chat-open={chatOpen}
+      className="min-h-screen bg-background flex flex-col transition-[padding] duration-[180ms] ease-out lg:data-[chat-open=true]:pl-[var(--chat-pane-width,440px)]"
+    >
       {/* Page header: breadcrumb + title + segmented tabs */}
       <header className="flex flex-col gap-[18px] px-7 py-[18px] border-b border-border bg-background no-print md:flex-row md:items-center md:gap-[18px]">
         <div className="flex flex-col gap-1 min-w-0">
@@ -1450,9 +1470,9 @@ export default function ResumeViewerPage() {
       {/* Body — hidden when ATS view is active */}
       {!atsView &&
         (activeTab === 'resume' && isEditingResume && resumeDraft ? (
-          <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 bg-border gap-[1px] no-print">
-            {/* Left: editor */}
-            <div className="bg-background overflow-y-auto p-6 md:p-8">
+          <div className="flex-1 min-h-0 flex flex-col-reverse lg:grid lg:grid-cols-2 bg-border gap-[1px] no-print">
+            {/* Editor (bottom half on mobile, left column on desktop) */}
+            <div className="flex-1 min-h-0 bg-background overflow-y-auto p-6 md:p-8">
               <div className="max-w-3xl mx-auto space-y-6">
                 <div className="flex items-center gap-2 border-b-2 border-border pb-2">
                   <div className="w-3 h-3 bg-primary" />
@@ -1464,8 +1484,8 @@ export default function ResumeViewerPage() {
                 <ResumeForm resumeData={resumeDraft} onUpdate={setResumeDraft} />
               </div>
             </div>
-            {/* Right: live preview with drag-and-drop QR */}
-            <div className="bg-secondary overflow-hidden flex flex-col">
+            {/* Live preview with drag-and-drop QR (top half on mobile, right column on desktop) */}
+            <div className="flex-1 min-h-0 bg-secondary overflow-hidden flex flex-col">
               <div className="flex-1 overflow-y-auto">
                 <PaginatedPreview
                   resumeData={localizedResumeDraft || resumeDraft}
@@ -1476,9 +1496,9 @@ export default function ResumeViewerPage() {
             </div>
           </div>
         ) : activeTab === 'cv' && isEditingCv && cvDraft ? (
-          <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 bg-border gap-[1px] no-print">
-            {/* Left: CV editor (separate from the resume editor) */}
-            <div className="bg-background overflow-y-auto p-6 md:p-8">
+          <div className="flex-1 min-h-0 flex flex-col-reverse lg:grid lg:grid-cols-2 bg-border gap-[1px] no-print">
+            {/* CV editor (bottom half on mobile, left column on desktop) */}
+            <div className="flex-1 min-h-0 bg-background overflow-y-auto p-6 md:p-8">
               <div className="max-w-3xl mx-auto space-y-6">
                 <div className="flex items-center gap-2 border-b-2 border-border pb-2">
                   <div className="w-3 h-3 bg-primary" />
@@ -1490,8 +1510,8 @@ export default function ResumeViewerPage() {
                 <ResumeForm resumeData={cvDraft} onUpdate={setCvDraft} />
               </div>
             </div>
-            {/* Right: CV live preview */}
-            <div className="bg-secondary overflow-hidden flex flex-col">
+            {/* CV live preview (top half on mobile, right column on desktop) */}
+            <div className="flex-1 min-h-0 bg-secondary overflow-hidden flex flex-col">
               <div className="flex-1 overflow-y-auto">
                 <PaginatedPreview
                   resumeData={localizedCvDraft || cvDraft}
@@ -1502,9 +1522,9 @@ export default function ResumeViewerPage() {
             </div>
           </div>
         ) : activeTab === 'coverLetter' && isEditingCoverLetter ? (
-          <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 bg-border gap-[1px] no-print">
-            {/* Left: editor */}
-            <div className="bg-background overflow-y-auto">
+          <div className="flex-1 min-h-0 flex flex-col-reverse lg:grid lg:grid-cols-2 bg-border gap-[1px] no-print">
+            {/* Editor (bottom half on mobile, left column on desktop) */}
+            <div className="flex-1 min-h-0 bg-background overflow-y-auto">
               <CoverLetterEditor
                 content={coverLetterDraft}
                 onChange={setCoverLetterDraft}
@@ -1514,8 +1534,8 @@ export default function ResumeViewerPage() {
                 onSettingsChange={handleCoverLetterSettingsChange}
               />
             </div>
-            {/* Right: live preview */}
-            <div className="bg-secondary overflow-y-auto p-4 md:p-6 flex justify-center">
+            {/* Live preview (top half on mobile, right column on desktop) */}
+            <div className="flex-1 min-h-0 bg-secondary overflow-y-auto p-4 md:p-6 flex justify-center">
               <CoverLetterPreview
                 content={coverLetterDraft}
                 personalInfo={resumeData?.personalInfo ?? {}}
@@ -1993,7 +2013,12 @@ export default function ResumeViewerPage() {
         />
       )}
       {resumeId && (
-        <ChatBot resumeId={resumeId} activeTab={activeTab} onDocumentChanged={reloadResumeData} />
+        <ChatBot
+          resumeId={resumeId}
+          activeTab={activeTab}
+          onDocumentChanged={handleChatDocumentChanged}
+          onOpenChange={setChatOpen}
+        />
       )}
     </div>
   );

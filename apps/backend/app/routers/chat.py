@@ -272,6 +272,65 @@ def _ground_in_resume(resume_title: str | None, resume_json: dict[str, Any]) -> 
     )
 
 
+def _resume_job_description(resume: dict[str, Any]) -> str | None:
+    """Best-effort lookup of the JD a tailored resume was created against."""
+    if not resume.get("parent_id"):
+        return None
+    improvement = db.get_improvement_by_tailored_resume(resume["resume_id"])
+    if not improvement:
+        return None
+    job = db.get_job(improvement.get("job_id"))
+    if not job:
+        return None
+    content = job.get("content")
+    return content.strip() if isinstance(content, str) and content.strip() else None
+
+
+def _extra_context_grounding(resume: dict[str, Any]) -> str:
+    """Optional grounding: the master resume and the target job description.
+
+    When the chat is scoped to a *tailored* resume, the assistant works better
+    with sight of the full master resume (the source of truth for facts the
+    tailored copy may have trimmed) and the job description it was tailored
+    against. Both lookups are best-effort — any failure is skipped so chat
+    keeps working without them.
+    """
+    parts: list[str] = []
+
+    # Master resume — only when it's a distinct document from the one in chat.
+    master = db.resolve_master_for_resume(resume)
+    if master and master.get("resume_id") != resume.get("resume_id"):
+        try:
+            master_json = _resume_json_payload(master)
+        except HTTPException:
+            master_json = None
+        if master_json is not None:
+            master_title = (
+                master.get("title") or master.get("filename") or "(untitled)"
+            )
+            parts.append(
+                f"For additional context, here is the user's MASTER resume "
+                f"titled '{master_title}'. The resume above was tailored from "
+                f"this master. Use it to recall facts (roles, dates, "
+                f"accomplishments) that may have been trimmed from the tailored "
+                f"copy — but do not invent anything not present here.\n\n"
+                f"MASTER_RESUME_JSON:\n```json\n"
+                f"{json.dumps(master_json, ensure_ascii=False)}\n```"
+            )
+
+    # Target job description — only present for tailored resumes.
+    job_text = _resume_job_description(resume)
+    if job_text:
+        parts.append(
+            "This resume was tailored to the following target job description. "
+            "Use it to judge relevance and fit when answering or proposing "
+            "changes.\n\n"
+            f'JOB_DESCRIPTION:\n"""\n{job_text}\n"""'
+        )
+
+    return "\n\n".join(parts)
+
+
 def _proposal_instructions(kind: Literal["edit", "create"]) -> str:
     if kind == "edit":
         intent = (
@@ -356,6 +415,9 @@ async def chat_with_resume(resume_id: str, request: ChatRequest) -> ChatResponse
     title = resume.get("title") or resume.get("filename")
 
     grounding = _ground_in_resume(title, resume_json)
+    extra = _extra_context_grounding(resume)
+    if extra:
+        grounding = f"{grounding}\n\n{extra}"
 
     try:
         if request.mode == "qa":
@@ -562,6 +624,10 @@ async def chat_with_document(
                 )
             except HTTPException:
                 pass
+
+        extra = _extra_context_grounding(resume)
+        if extra:
+            grounding = f"{grounding}\n\n{extra}"
 
         # -- Discuss mode --
         if request.mode == "discuss":

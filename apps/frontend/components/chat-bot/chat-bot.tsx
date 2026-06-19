@@ -87,6 +87,11 @@ interface ChatBotProps {
   onDocumentChanged?: () => void;
   /** @deprecated Use onDocumentChanged */
   onResumeChanged?: () => void;
+  /**
+   * Notified whenever the pane is opened or minimized. Lets the host page
+   * push its content aside so the pane sits beside it instead of overlaying.
+   */
+  onOpenChange?: (open: boolean) => void;
 }
 
 const INTERNAL_MODE_LABELS: Record<InternalMode, string> = {
@@ -107,6 +112,7 @@ export function ChatBot({
   activeTab = 'resume',
   onDocumentChanged,
   onResumeChanged,
+  onOpenChange,
 }: ChatBotProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -141,6 +147,10 @@ export function ChatBot({
 
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const taRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useEffect(() => {
+    onOpenChange?.(open);
+  }, [open, onOpenChange]);
 
   useEffect(() => {
     bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight });
@@ -499,8 +509,8 @@ export function ChatBot({
             type="button"
             className={styles.iconBtn}
             onClick={() => setOpen(false)}
-            title="Close"
-            aria-label="Close assistant"
+            title="Minimize"
+            aria-label="Minimize assistant"
           >
             <XIcon size={14} strokeWidth={1.75} />
           </button>
