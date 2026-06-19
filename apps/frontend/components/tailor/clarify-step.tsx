@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ChevronLeft, ChevronRight, SkipForward } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, SkipForward } from 'lucide-react';
 import type { ClarifyQuestion } from '@/lib/api/resume';
 import { useTranslations } from '@/lib/i18n';
 
@@ -11,7 +11,10 @@ interface ClarifyStepProps {
   questions: ClarifyQuestion[];
   /** Map of question_id -> answer text (empty string = skipped) */
   answers: Record<string, string>;
+  /** Map of question_id -> checked option_ids (checklist questions only) */
+  selections: Record<string, string[]>;
   onAnswer: (questionId: string, answer: string) => void;
+  onToggleOption: (questionId: string, optionId: string) => void;
   onFinish: (freeform: string) => void;
   onBack: () => void;
 }
@@ -23,7 +26,15 @@ interface ClarifyStepProps {
  * After the last question, shows an optional free-response textarea before
  * calling onFinish.
  */
-export function ClarifyStep({ questions, answers, onAnswer, onFinish, onBack }: ClarifyStepProps) {
+export function ClarifyStep({
+  questions,
+  answers,
+  selections,
+  onAnswer,
+  onToggleOption,
+  onFinish,
+  onBack,
+}: ClarifyStepProps) {
   const { t } = useTranslations();
   const [currentIdx, setCurrentIdx] = useState(0);
   const [freeformMode, setFreeformMode] = useState(false);
@@ -35,6 +46,8 @@ export function ClarifyStep({ questions, answers, onAnswer, onFinish, onBack }: 
   const isFreeformStep = freeformMode;
   const currentQuestion = !isFreeformStep ? questions[currentIdx] : null;
   const currentAnswer = currentQuestion ? (answers[currentQuestion.question_id] ?? '') : '';
+  const isChecklist = currentQuestion?.kind === 'checklist' && currentQuestion.options.length > 0;
+  const currentSelections = currentQuestion ? (selections[currentQuestion.question_id] ?? []) : [];
 
   // Auto-focus the textarea when the question changes
   useEffect(() => {
@@ -64,12 +77,15 @@ export function ClarifyStep({ questions, answers, onAnswer, onFinish, onBack }: 
   }, [isFreeformStep, currentIdx, onBack]);
 
   const handleSkip = useCallback(() => {
-    // Clear any stored answer so skipped questions aren't passed to backend
+    // Clear any stored answer (and checked entries) so skipped questions
+    // aren't passed to the backend.
     if (currentQuestion) {
       onAnswer(currentQuestion.question_id, '');
+      const checked = selections[currentQuestion.question_id] ?? [];
+      checked.forEach((optionId) => onToggleOption(currentQuestion.question_id, optionId));
     }
     handleNext();
-  }, [currentQuestion, onAnswer, handleNext]);
+  }, [currentQuestion, onAnswer, onToggleOption, selections, handleNext]);
 
   const handleFinish = useCallback(() => {
     onFinish(freeform.trim());
@@ -184,14 +200,58 @@ export function ClarifyStep({ questions, answers, onAnswer, onFinish, onBack }: 
           {currentQuestion.question}
         </h2>
 
-        <Textarea
-          ref={textareaRef}
-          value={currentAnswer}
-          onChange={(e) => onAnswer(currentQuestion.question_id, e.target.value)}
-          onKeyDown={handleTextareaKeyDown}
-          placeholder={currentQuestion.placeholder || t('tailor.clarifyStep.answerPlaceholder')}
-          className="min-h-[140px] font-mono text-sm bg-background border-2 border-border focus:ring-0 focus:border-primary resize-none p-3 rounded-none"
-        />
+        {isChecklist ? (
+          <>
+            <ul className="space-y-2 mb-5">
+              {currentQuestion.options.map((option) => {
+                const checked = currentSelections.includes(option.option_id);
+                return (
+                  <li key={option.option_id}>
+                    <button
+                      type="button"
+                      onClick={() => onToggleOption(currentQuestion.question_id, option.option_id)}
+                      aria-pressed={checked}
+                      className={`flex w-full items-center gap-3 border-2 p-3 text-left font-mono text-sm transition-colors rounded-none ${
+                        checked
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border bg-background hover:border-primary'
+                      }`}
+                    >
+                      <span
+                        className={`flex h-5 w-5 shrink-0 items-center justify-center border-2 rounded-none ${
+                          checked ? 'border-primary bg-primary text-white' : 'border-border'
+                        }`}
+                      >
+                        {checked && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+                      </span>
+                      {option.label}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+            <label className="font-mono text-xs text-steel-grey mb-2 block">
+              {t('tailor.clarifyStep.expandLabel')}
+            </label>
+            <Textarea
+              ref={textareaRef}
+              value={currentAnswer}
+              onChange={(e) => onAnswer(currentQuestion.question_id, e.target.value)}
+              onKeyDown={handleTextareaKeyDown}
+              placeholder={currentQuestion.placeholder || t('tailor.clarifyStep.expandPlaceholder')}
+              className="min-h-[100px] font-mono text-sm bg-background border-2 border-border focus:ring-0 focus:border-primary resize-none p-3 rounded-none"
+            />
+          </>
+        ) : (
+          <Textarea
+            ref={textareaRef}
+            value={currentAnswer}
+            onChange={(e) => onAnswer(currentQuestion.question_id, e.target.value)}
+            onKeyDown={handleTextareaKeyDown}
+            placeholder={currentQuestion.placeholder || t('tailor.clarifyStep.answerPlaceholder')}
+            className="min-h-[140px] font-mono text-sm bg-background border-2 border-border focus:ring-0 focus:border-primary resize-none p-3 rounded-none"
+          />
+        )}
         <p className="text-xs text-steel-grey mt-2 font-mono">
           {t('tailor.clarifyStep.shortcutHint')}
         </p>

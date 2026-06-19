@@ -25,6 +25,7 @@ from app.prompts.templates.resume import (
 from app.schemas import ResumeData, ResumeFieldDiff, ResumeDiffSummary
 from app.schemas.models import (
     ClarificationSet,
+    ClarifyOption,
     ClarifyQuestion,
     ImproveDiffResult,
     ResumeChange,
@@ -651,8 +652,19 @@ def _append_clarifications(
     for item in clarifications.items:
         q = (item.question or "").strip()
         a = _sanitize_user_input((item.answer or "").strip())
-        if q and a:
-            lines.append(f"Q: {q}\nA: {a}")
+        selected = [
+            _sanitize_user_input(s.strip())
+            for s in (item.selected or [])
+            if s and s.strip()
+        ]
+        if not q or (not a and not selected):
+            continue
+        parts = [f"Q: {q}"]
+        if selected:
+            parts.append("Relevant experiences/projects: " + ", ".join(selected))
+        if a:
+            parts.append(f"A: {a}")
+        lines.append("\n".join(parts))
 
     freeform = _sanitize_user_input((clarifications.freeform or "").strip())
     if freeform:
@@ -667,6 +679,40 @@ def _append_clarifications(
         + "\n\n".join(lines)
     )
     return prompt + "\n\n" + block
+
+
+def _build_entry_labels(resume_data: dict[str, Any]) -> dict[str, str]:
+    """Map checklist option ids to human-readable labels for a resume.
+
+    Work experience entries become ``exp:<id>`` and projects ``proj:<id>``.
+    Labels combine the most identifying fields (title/company or project name)
+    so the candidate recognizes each entry. Entries with no identifying text
+    are skipped. Ids fall back to list position when an entry lacks an ``id``.
+    """
+    labels: dict[str, str] = {}
+
+    for idx, exp in enumerate(resume_data.get("workExperience", []) or []):
+        if not isinstance(exp, dict):
+            continue
+        eid = exp.get("id") if isinstance(exp.get("id"), int) and exp.get("id") else idx + 1
+        title = str(exp.get("title", "")).strip()
+        company = str(exp.get("company", "")).strip()
+        parts = [p for p in (title, company) if p]
+        if not parts:
+            continue
+        labels[f"exp:{eid}"] = " — ".join(parts)
+
+    for idx, proj in enumerate(resume_data.get("projects", []) or []):
+        if not isinstance(proj, dict):
+            continue
+        pid = proj.get("id") if isinstance(proj.get("id"), int) and proj.get("id") else idx + 1
+        name = str(proj.get("name", "")).strip()
+        role = str(proj.get("role", "")).strip()
+        if not name:
+            continue
+        labels[f"proj:{pid}"] = f"{name} — {role}" if role else name
+
+    return labels
 
 
 async def generate_clarifying_questions(
@@ -697,6 +743,17 @@ async def generate_clarifying_questions(
 
     resume_input = json.dumps(original_resume_data, ensure_ascii=False)
 
+    # Build the enumerated entries block and a map of valid option_id -> label.
+    # Checklist questions may only reference these ids; labels are authoritative
+    # server-side so the LLM cannot fabricate entries.
+    entry_labels = _build_entry_labels(original_resume_data)
+    if entry_labels:
+        entries_block = "\n".join(
+            f"- {oid}: {label}" for oid, label in entry_labels.items()
+        )
+    else:
+        entries_block = "(no work experience or project entries)"
+
     # Build optional guidance block
     guidance_lines: list[str] = []
     if guidance:
@@ -720,6 +777,7 @@ async def generate_clarifying_questions(
         current_date=current_date,
         job_description=sanitized_jd,
         original_resume=resume_input,
+        entries_block=entries_block,
         guidance_block=guidance_block,
     )
 
@@ -750,12 +808,36 @@ async def generate_clarifying_questions(
         question_text = str(raw.get("question", "")).strip()
         if not question_text:
             continue
+
+        # Resolve checklist options against the known entries. Unknown ids are
+        # dropped; labels are always taken from the resume, not the LLM. A
+        # checklist that ends up with fewer than 2 valid options degrades to a
+        # plain text question.
+        kind = "checklist" if str(raw.get("kind", "text")) == "checklist" else "text"
+        options: list[ClarifyOption] = []
+        if kind == "checklist":
+            seen: set[str] = set()
+            for opt in raw.get("options", []) or []:
+                if not isinstance(opt, dict):
+                    continue
+                oid = str(opt.get("option_id", "")).strip()
+                if oid in entry_labels and oid not in seen:
+                    seen.add(oid)
+                    options.append(
+                        ClarifyOption(option_id=oid, label=entry_labels[oid])
+                    )
+            if len(options) < 2:
+                kind = "text"
+                options = []
+
         questions.append(
             ClarifyQuestion(
                 question_id=qid,
                 question=question_text,
                 placeholder=str(raw.get("placeholder", "")),
                 context=str(raw.get("context", "")),
+                kind=kind,
+                options=options,
             )
         )
 

@@ -529,13 +529,33 @@ class JobUploadResponse(BaseModel):
 
 
 # Clarifying Questions Models
+class ClarifyOption(BaseModel):
+    """A selectable resume entry (experience or project) for a checklist question.
+
+    ``option_id`` is a stable reference of the form ``exp:<id>`` or
+    ``proj:<id>`` mapping back to a resume entry. ``label`` is the
+    human-readable entry name shown beside the checkbox.
+    """
+
+    option_id: str
+    label: str
+
+
 class ClarifyQuestion(BaseModel):
-    """A single AI-generated clarifying question for the candidate."""
+    """A single AI-generated clarifying question for the candidate.
+
+    ``kind`` is ``"text"`` for an open free-response question or
+    ``"checklist"`` when the answer is a selection of specific resume entries
+    (with an optional expansion note). ``options`` is only populated for
+    checklist questions.
+    """
 
     question_id: str
     question: str
     placeholder: str = ""
     context: str = ""
+    kind: Literal["text", "checklist"] = "text"
+    options: list[ClarifyOption] = Field(default_factory=list)
 
 
 class ClarifyResponse(BaseModel):
@@ -546,10 +566,17 @@ class ClarifyResponse(BaseModel):
 
 
 class ClarificationItem(BaseModel):
-    """A single answered clarifying question."""
+    """A single answered clarifying question.
+
+    ``selected`` holds the labels of the resume entries the candidate checked
+    for a checklist question (empty for plain text questions). ``answer`` is
+    the free-response text — for checklist questions it is the optional
+    expansion note and may be empty when only checkboxes were used.
+    """
 
     question: str
-    answer: str
+    answer: str = ""
+    selected: list[str] = Field(default_factory=list)
 
 
 class ClarificationSet(BaseModel):

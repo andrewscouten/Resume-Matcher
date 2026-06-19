@@ -581,8 +581,15 @@ async def _generate_auxiliary_messages(
         for item in clarifications.items:
             q = (item.question or "").strip()
             a = (item.answer or "").strip()
-            if q and a:
-                lines.append(f"Q: {q}\nA: {a}")
+            selected = [s.strip() for s in (item.selected or []) if s and s.strip()]
+            if not q or (not a and not selected):
+                continue
+            parts = [f"Q: {q}"]
+            if selected:
+                parts.append("Relevant experiences/projects: " + ", ".join(selected))
+            if a:
+                parts.append(f"A: {a}")
+            lines.append("\n".join(parts))
         if clarifications.freeform and clarifications.freeform.strip():
             lines.append(f"Additional context: {clarifications.freeform.strip()}")
         if lines:

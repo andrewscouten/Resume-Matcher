@@ -117,11 +117,20 @@ export interface GuidanceSet {
   outreach?: string | null;
 }
 
+export interface ClarifyOption {
+  option_id: string;
+  label: string;
+}
+
 export interface ClarifyQuestion {
   question_id: string;
   question: string;
   placeholder: string;
   context: string;
+  /** "text" = open response; "checklist" = pick relevant resume entries */
+  kind: 'text' | 'checklist';
+  /** Selectable resume entries, only populated for checklist questions */
+  options: ClarifyOption[];
 }
 
 export interface ClarifyResponse {
@@ -132,6 +141,8 @@ export interface ClarifyResponse {
 export interface ClarificationItem {
   question: string;
   answer: string;
+  /** Labels of the resume entries checked for a checklist question */
+  selected?: string[];
 }
 
 export interface ClarificationSet {

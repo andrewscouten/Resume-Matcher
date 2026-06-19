@@ -669,6 +669,8 @@
       "freeformDescription": "Opcional: compartilhe qualquer contexto que possa ajudar a IA a personalizar seu currículo com mais precisão.",
       "freeformPlaceholder": "Exemplo: Deixei esse cargo após um ano devido a uma aquisição, não por desempenho.",
       "answerPlaceholder": "Digite sua resposta aqui, ou clique em Pular.",
+      "expandLabel": "Opcional: adicione detalhes (você pode referir-se a mais de uma entrada)",
+      "expandPlaceholder": "Opcional: descreva como cada uma se aplica — você pode mencionar vários cargos ou projetos.",
       "skip": "Pular",
       "continueToGenerate": "Continuar para gerar",
       "shortcutHint": "Ctrl+Enter para continuar",

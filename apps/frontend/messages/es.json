@@ -660,6 +660,8 @@
       "freeformDescription": "Opcional: comparte cualquier contexto que pueda ayudar a la IA a adaptar tu currículum con más precisión.",
       "freeformPlaceholder": "Ejemplo: Dejé este puesto después de un año debido a una adquisición, no por rendimiento.",
       "answerPlaceholder": "Escribe tu respuesta aquí, o haz clic en Omitir.",
+      "expandLabel": "Opcional: añade detalles (puedes referirte a más de una entrada)",
+      "expandPlaceholder": "Opcional: describe cómo se aplica cada una — puedes mencionar varios puestos o proyectos.",
       "skip": "Omitir",
       "continueToGenerate": "Continuar a la generación",
       "shortcutHint": "Ctrl+Intro para continuar",

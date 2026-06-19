@@ -669,6 +669,8 @@
       "freeformDescription": "オプション：AI が履歴書をより正確にカスタマイズするのに役立つコンテキストを共有してください。",
       "freeformPlaceholder": "例：この職を1年後に退職したのは会社買収のためであり、業績の問題ではありません。",
       "answerPlaceholder": "ここに回答を入力するか、スキップをクリックしてください。",
+      "expandLabel": "任意：詳細を追加（複数の項目に言及できます）",
+      "expandPlaceholder": "任意：それぞれがどう関係するか説明してください。複数の職務やプロジェクトに触れても構いません。",
       "skip": "スキップ",
       "continueToGenerate": "生成を続ける",
       "shortcutHint": "Ctrl+Enterで続ける",

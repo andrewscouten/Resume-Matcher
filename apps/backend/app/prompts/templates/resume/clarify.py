@@ -24,6 +24,17 @@ NEVER ask about:
 
 The goal is to collect FACTS the candidate knows that aren't in the resume, so the tailoring can truthfully use them.
 
+QUESTION TYPES:
+- "text": an open question the candidate answers in 1-3 sentences. Use for impact/scope/metric gaps or single-topic facts.
+- "checklist": use when the JD emphasizes a skill, tool, or domain (e.g. SQL, Kubernetes, fundraising) and the candidate has MULTIPLE experiences or projects that could plausibly involve it, but the resume doesn't make the connection explicit. The candidate checks which of their listed experiences/projects actually involved that skill and can optionally expand. Prefer "checklist" over "text" whenever the question is "which of your roles/projects involved X?".
+
+CHECKLIST RULES:
+- Set "kind": "checklist" and populate "options" with the relevant entries drawn ONLY from the RESUME ENTRIES list below.
+- Each option's "option_id" MUST be copied verbatim from the RESUME ENTRIES list (e.g. "exp:2", "proj:1"). Never invent ids or labels.
+- Include every entry where the skill could plausibly apply — let the candidate decide. Do not include entries with no plausible connection.
+- The "question" should name the specific skill/domain (e.g. "Which of these involved hands-on SQL work?"), and "placeholder" should hint at the optional expansion (e.g. "Optional: how you used SQL in each — you can mention multiple roles").
+- A checklist with fewer than 2 options is pointless; use a "text" question instead.
+
 QUALITY CRITERIA (from which you should identify gaps):
 - Bullets should lead with concrete action verbs and show action + what + result/impact
 - Quantify scope, scale, volume, or frequency wherever the work involved it (team size, users, requests, datasets)
@@ -48,6 +59,9 @@ JOB DESCRIPTION:
 RESUME (JSON):
 {original_resume}
 
+RESUME ENTRIES (use these exact option_id values for checklist questions):
+{entries_block}
+
 {guidance_block}
 
 OUTPUT FORMAT (JSON only, no other text):
@@ -57,7 +71,20 @@ OUTPUT FORMAT (JSON only, no other text):
       "question_id": "q_0",
       "question": "The specific question text for the candidate",
       "placeholder": "Example answer that shows what kind of information is needed",
-      "context": "One-sentence internal note on why this matters for this JD"
+      "context": "One-sentence internal note on why this matters for this JD",
+      "kind": "text",
+      "options": []
+    }},
+    {{
+      "question_id": "q_1",
+      "question": "Which of these involved hands-on SQL work?",
+      "placeholder": "Optional: how you used SQL in each — you can mention multiple roles",
+      "context": "JD lists SQL as a core requirement; several roles could plausibly involve it.",
+      "kind": "checklist",
+      "options": [
+        {{ "option_id": "exp:1", "label": "" }},
+        {{ "option_id": "proj:2", "label": "" }}
+      ]
     }}
   ],
   "analysis_summary": "1-2 sentence summary of the resume-to-JD fit and what the questions will unlock (or why no questions are needed)"

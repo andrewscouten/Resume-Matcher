@@ -669,6 +669,8 @@
       "freeformDescription": "可选：分享任何有助于 AI 更准确地定制简历的背景信息。",
       "freeformPlaceholder": "例如：我在这个职位工作了一年后离职，原因是公司被收购，而非绩效问题。",
       "answerPlaceholder": "在此输入您的答案，或点击跳过。",
+      "expandLabel": "可选：补充细节（可以涉及多个条目）",
+      "expandPlaceholder": "可选：说明每一项如何相关——可以提及多个职位或项目。",
       "skip": "跳过",
       "continueToGenerate": "继续生成",
       "shortcutHint": "Ctrl+Enter 继续",

@@ -62,6 +62,8 @@ function TailorPage() {
   // Clarifying Q&A
   const [clarifyQuestions, setClarifyQuestions] = useState<ClarifyQuestion[]>([]);
   const [clarifyAnswers, setClarifyAnswers] = useState<Record<string, string>>({});
+  // Map of question_id -> checked option_ids for checklist questions
+  const [clarifySelections, setClarifySelections] = useState<Record<string, string[]>>({});
   const [isClarifying, setIsClarifying] = useState(false);
 
   // Stored job_id so we can pass it when clarify completes
@@ -199,14 +201,17 @@ function TailorPage() {
 
   const buildClarificationsPayload = (freeform?: string): ClarificationSet | null => {
     const items: ClarificationItem[] = clarifyQuestions
-      .filter((q) => {
-        const ans = (clarifyAnswers[q.question_id] ?? '').trim();
-        return ans.length > 0;
+      .map((q) => {
+        const answer = (clarifyAnswers[q.question_id] ?? '').trim();
+        const checkedIds = q.kind === 'checklist' ? (clarifySelections[q.question_id] ?? []) : [];
+        const selected = q.options
+          .filter((o) => checkedIds.includes(o.option_id))
+          .map((o) => o.label);
+        return { question: q.question, answer, selected };
       })
-      .map((q) => ({
-        question: q.question,
-        answer: clarifyAnswers[q.question_id].trim(),
-      }));
+      // Keep an item only if the candidate provided something: free text or
+      // (for checklists) at least one checked entry.
+      .filter((item) => item.answer.length > 0 || item.selected.length > 0);
     const trimmedFreeform = (freeform ?? '').trim() || null;
     if (items.length === 0 && !trimmedFreeform) return null;
     return { items, freeform: trimmedFreeform };
@@ -369,6 +374,7 @@ function TailorPage() {
         // Reset previous answers
         setClarifyQuestions(clarifyResult.questions);
         setClarifyAnswers({});
+        setClarifySelections({});
         setStep('clarify');
       } else {
         // No questions — skip straight to generation
@@ -566,7 +572,17 @@ function TailorPage() {
               <ClarifyStep
                 questions={clarifyQuestions}
                 answers={clarifyAnswers}
+                selections={clarifySelections}
                 onAnswer={(qid, ans) => setClarifyAnswers((prev) => ({ ...prev, [qid]: ans }))}
+                onToggleOption={(qid, optionId) =>
+                  setClarifySelections((prev) => {
+                    const current = prev[qid] ?? [];
+                    const next = current.includes(optionId)
+                      ? current.filter((id) => id !== optionId)
+                      : [...current, optionId];
+                    return { ...prev, [qid]: next };
+                  })
+                }
                 onFinish={handleClarifyFinish}
                 onBack={() => setStep('guidance')}
               />

@@ -660,6 +660,8 @@
       "freeformDescription": "Optional: share any context that could help the AI tailor your resume more accurately. Leave blank to skip.",
       "freeformPlaceholder": "e.g. I left this role after a year due to a company acquisition, not performance. Feel free to frame it professionally.",
       "answerPlaceholder": "Type your answer here, or click Skip to leave it blank.",
+      "expandLabel": "Optional: add detail (you can reference more than one entry)",
+      "expandPlaceholder": "Optional: describe how each applies — you can mention multiple roles or projects.",
       "skip": "Skip",
       "continueToGenerate": "Continue to Generate",
       "shortcutHint": "Ctrl+Enter to continue",
