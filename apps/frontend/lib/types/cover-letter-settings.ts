@@ -10,9 +10,10 @@ export type CoverLetterHeadingField =
   | 'email'
   | 'phone'
   | 'location'
+  | 'website'
   | 'linkedin'
   | 'github'
-  | 'website';
+  | 'orcid';
 
 export interface CoverLetterFontSizes {
   /** Candidate name in the letterhead (pt) */
@@ -36,7 +37,7 @@ export interface CoverLetterSettings {
 
 export const DEFAULT_COVER_LETTER_SETTINGS: CoverLetterSettings = {
   headingStyle: 'professional',
-  headingFields: ['email', 'phone', 'location', 'linkedin'],
+  headingFields: ['email', 'phone', 'location', 'website', 'linkedin', 'github', 'orcid'],
   showTitle: true,
   fontSizes: {
     name: 22,
@@ -49,7 +50,39 @@ export const ALL_HEADING_FIELDS: CoverLetterHeadingField[] = [
   'email',
   'phone',
   'location',
+  'website',
   'linkedin',
   'github',
-  'website',
+  'orcid',
 ];
+
+/** Contact-detail fields rendered on the first letterhead line. */
+export const CONTACT_DETAIL_FIELDS: CoverLetterHeadingField[] = ['email', 'phone', 'location'];
+
+/** Profile/identity link fields rendered on the second letterhead line. */
+export const PROFILE_LINK_FIELDS: CoverLetterHeadingField[] = [
+  'website',
+  'linkedin',
+  'github',
+  'orcid',
+];
+
+/** Maps a heading field to the canonical contact label used for formatting. */
+export const FIELD_TO_CONTACT_LABEL: Record<
+  CoverLetterHeadingField,
+  'Email' | 'Phone' | 'Location' | 'Website' | 'LinkedIn' | 'GitHub' | 'ORCID'
+> = {
+  email: 'Email',
+  phone: 'Phone',
+  location: 'Location',
+  website: 'Website',
+  linkedin: 'LinkedIn',
+  github: 'GitHub',
+  orcid: 'ORCID',
+};
+
+/** Href prefix for plain (non-URL) contact fields. */
+export const FIELD_HREF_PREFIX: Partial<Record<CoverLetterHeadingField, string>> = {
+  email: 'mailto:',
+  phone: 'tel:',
+};

@@ -1,13 +1,19 @@
 'use client';
 
 import * as React from 'react';
+import { Mail, Phone, MapPin, Globe, Linkedin, Github, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslations } from '@/lib/i18n';
+import { formatContact, type ContactLabel } from '@/lib/utils/contact-info';
 import {
   type CoverLetterSettings,
   type CoverLetterHeadingField,
   DEFAULT_COVER_LETTER_SETTINGS,
   type CoverLetterFontSizes,
+  CONTACT_DETAIL_FIELDS,
+  PROFILE_LINK_FIELDS,
+  FIELD_TO_CONTACT_LABEL,
+  FIELD_HREF_PREFIX,
 } from '@/lib/types/cover-letter-settings';
 
 export interface CoverLetterPersonalInfo {
@@ -19,7 +25,18 @@ export interface CoverLetterPersonalInfo {
   website?: string;
   linkedin?: string;
   github?: string;
+  orcid?: string;
 }
+
+const CONTACT_ICONS: Record<ContactLabel, React.ReactNode> = {
+  Email: <Mail size={12} />,
+  Phone: <Phone size={12} />,
+  Location: <MapPin size={12} />,
+  Website: <Globe size={12} />,
+  LinkedIn: <Linkedin size={12} />,
+  GitHub: <Github size={12} />,
+  ORCID: <ExternalLink size={12} />,
+};
 
 export interface CoverLetterPreviewProps {
   /** Cover letter content */
@@ -34,14 +51,73 @@ export interface CoverLetterPreviewProps {
   className?: string;
 }
 
-function getFieldValue(
-  personalInfo: CoverLetterPersonalInfo,
-  field: CoverLetterHeadingField
-): string | undefined {
-  return personalInfo[field];
+function ContactItem({
+  field,
+  personalInfo,
+}: {
+  field: CoverLetterHeadingField;
+  personalInfo: CoverLetterPersonalInfo;
+}) {
+  const value = personalInfo[field];
+  if (!value) return null;
+
+  const label = FIELD_TO_CONTACT_LABEL[field];
+  const { href, displayText, isLink } = formatContact(label, value, FIELD_HREF_PREFIX[field] ?? '');
+
+  return (
+    <span className="inline-flex items-center gap-1">
+      {CONTACT_ICONS[label]}
+      {isLink ? (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-hyper-blue hover:underline"
+        >
+          {displayText}
+        </a>
+      ) : (
+        <span>{displayText}</span>
+      )}
+    </span>
+  );
 }
 
-function ContactLine({
+function ContactRow({
+  personalInfo,
+  fields,
+  enabled,
+  centered,
+  fontSizes,
+  className,
+}: {
+  personalInfo: CoverLetterPersonalInfo;
+  fields: CoverLetterHeadingField[];
+  enabled: CoverLetterHeadingField[];
+  centered: boolean;
+  fontSizes: CoverLetterFontSizes;
+  className?: string;
+}) {
+  const visible = fields.filter((f) => enabled.includes(f) && !!personalInfo[f]);
+  if (visible.length === 0) return null;
+
+  return (
+    <div
+      className={cn(
+        'flex flex-wrap gap-x-3 gap-y-1 font-mono leading-[1.6] text-ink',
+        centered ? 'justify-center' : 'justify-start',
+        className
+      )}
+      style={{ fontSize: `${fontSizes.contact}pt` }}
+    >
+      {visible.map((f) => (
+        <ContactItem key={f} field={f} personalInfo={personalInfo} />
+      ))}
+    </div>
+  );
+}
+
+function ContactLines({
   personalInfo,
   fields,
   style,
@@ -52,19 +128,26 @@ function ContactLine({
   style: CoverLetterSettings['headingStyle'];
   fontSizes: CoverLetterFontSizes;
 }) {
-  const items = fields.map((f) => getFieldValue(personalInfo, f)).filter((v): v is string => !!v);
-
-  if (items.length === 0) return null;
-
   const centered = style === 'centered';
 
   return (
-    <div
-      className={cn('font-mono leading-[1.6] text-ink', centered ? 'text-center' : 'text-left')}
-      style={{ fontSize: `${fontSizes.contact}pt` }}
-    >
-      {items.join('  ·  ')}
-    </div>
+    <>
+      <ContactRow
+        personalInfo={personalInfo}
+        fields={CONTACT_DETAIL_FIELDS}
+        enabled={fields}
+        centered={centered}
+        fontSizes={fontSizes}
+      />
+      <ContactRow
+        personalInfo={personalInfo}
+        fields={PROFILE_LINK_FIELDS}
+        enabled={fields}
+        centered={centered}
+        fontSizes={fontSizes}
+        className="mt-1"
+      />
+    </>
   );
 }
 
@@ -116,8 +199,8 @@ export function CoverLetterPreview({
             >
               {personalInfo.name || t('coverLetter.preview.defaultName')}
             </h1>
-            <div className="mt-2 text-ink-soft flex flex-wrap gap-x-4 gap-y-1">
-              <ContactLine
+            <div className="mt-2">
+              <ContactLines
                 personalInfo={personalInfo}
                 fields={s.headingFields}
                 style={s.headingStyle}
@@ -143,7 +226,7 @@ export function CoverLetterPreview({
               </p>
             )}
             <div className="mt-3">
-              <ContactLine
+              <ContactLines
                 personalInfo={personalInfo}
                 fields={s.headingFields}
                 style={s.headingStyle}

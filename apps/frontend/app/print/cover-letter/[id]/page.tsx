@@ -6,15 +6,31 @@
  */
 
 import type { Metadata } from 'next';
+import { Mail, Phone, MapPin, Globe, Linkedin, Github, ExternalLink } from 'lucide-react';
 import { API_BASE } from '@/lib/api/client';
 import { translate } from '@/lib/i18n/server';
 import { resolveLocale } from '@/lib/i18n/locale';
+import { formatContact, type ContactLabel } from '@/lib/utils/contact-info';
 import {
   type CoverLetterSettings,
   type CoverLetterHeadingField,
   type CoverLetterFontSizes,
   DEFAULT_COVER_LETTER_SETTINGS,
+  CONTACT_DETAIL_FIELDS,
+  PROFILE_LINK_FIELDS,
+  FIELD_TO_CONTACT_LABEL,
+  FIELD_HREF_PREFIX,
 } from '@/lib/types/cover-letter-settings';
+
+const CONTACT_ICONS: Record<ContactLabel, React.ReactNode> = {
+  Email: <Mail size={11} />,
+  Phone: <Phone size={11} />,
+  Location: <MapPin size={11} />,
+  Website: <Globe size={11} />,
+  LinkedIn: <Linkedin size={11} />,
+  GitHub: <Github size={11} />,
+  ORCID: <ExternalLink size={11} />,
+};
 
 export const metadata: Metadata = { title: '' };
 
@@ -39,9 +55,10 @@ interface PersonalInfo {
   email?: string;
   phone?: string;
   location?: string;
+  website?: string;
   linkedin?: string;
   github?: string;
-  website?: string;
+  orcid?: string;
 }
 
 interface CoverLetterData {
@@ -99,11 +116,59 @@ function parsePageSize(value: string | undefined): PageSize {
   return 'A4';
 }
 
-function getFieldValue(
+function renderContactRow(
   personalInfo: PersonalInfo,
-  field: CoverLetterHeadingField
-): string | undefined {
-  return personalInfo[field];
+  rowFields: CoverLetterHeadingField[],
+  enabled: CoverLetterHeadingField[],
+  centered: boolean,
+  fontSizePt: number,
+  marginTop: string
+): React.ReactNode {
+  const visible = rowFields.filter((f) => enabled.includes(f) && !!personalInfo[f]);
+  if (visible.length === 0) return null;
+
+  return (
+    <div
+      style={{
+        marginTop,
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '2mm 5mm',
+        justifyContent: centered ? 'center' : 'flex-start',
+        fontSize: `${fontSizePt}pt`,
+        fontFamily: 'monospace',
+        color: '#111',
+        lineHeight: 1.6,
+      }}
+    >
+      {visible.map((field) => {
+        const value = personalInfo[field] as string;
+        const label = FIELD_TO_CONTACT_LABEL[field];
+        const { href, displayText, isLink } = formatContact(
+          label,
+          value,
+          FIELD_HREF_PREFIX[field] ?? ''
+        );
+        return (
+          <span key={field} style={{ display: 'inline-flex', alignItems: 'center', gap: '1mm' }}>
+            {CONTACT_ICONS[label]}
+            {isLink ? (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: '#1D4ED8', textDecoration: 'none' }}
+              >
+                {displayText}
+              </a>
+            ) : (
+              <span>{displayText}</span>
+            )}
+          </span>
+        );
+      })}
+    </div>
+  );
 }
 
 export default async function PrintCoverLetterPage({ params, searchParams }: PageProps) {
@@ -134,11 +199,22 @@ export default async function PrintCoverLetterPage({ params, searchParams }: Pag
   const minimal = settings.headingStyle === 'minimal';
   const fs = settings.fontSizes;
 
-  const contactItems = settings.headingFields
-    .map((f) => getFieldValue(personalInfo, f))
-    .filter((v): v is string => !!v);
-
-  const contactLine = contactItems.join('  ·  ');
+  const detailRow = renderContactRow(
+    personalInfo,
+    CONTACT_DETAIL_FIELDS,
+    settings.headingFields,
+    centered,
+    fs.contact,
+    '2mm'
+  );
+  const linkRow = renderContactRow(
+    personalInfo,
+    PROFILE_LINK_FIELDS,
+    settings.headingFields,
+    centered,
+    fs.contact,
+    '1mm'
+  );
 
   return (
     <div
@@ -172,18 +248,8 @@ export default async function PrintCoverLetterPage({ params, searchParams }: Pag
           >
             {personalInfo.name || nameFallback}
           </h1>
-          {contactLine && (
-            <div
-              style={{
-                marginTop: '2mm',
-                fontSize: `${fs.contact}pt`,
-                fontFamily: 'monospace',
-                color: '#444',
-              }}
-            >
-              {contactLine}
-            </div>
-          )}
+          {detailRow}
+          {linkRow}
         </header>
       ) : (
         /* Professional / Centered styles */
@@ -219,19 +285,8 @@ export default async function PrintCoverLetterPage({ params, searchParams }: Pag
               {personalInfo.title}
             </p>
           )}
-          {contactLine && (
-            <div
-              style={{
-                marginTop: '3mm',
-                fontSize: `${fs.contact}pt`,
-                fontFamily: 'monospace',
-                color: '#111',
-                lineHeight: 1.6,
-              }}
-            >
-              {contactLine}
-            </div>
-          )}
+          {detailRow}
+          {linkRow}
         </header>
       )}
 

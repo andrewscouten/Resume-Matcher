@@ -23,9 +23,10 @@ const FIELD_LABELS: Record<CoverLetterHeadingField, string> = {
   email: 'Email',
   phone: 'Phone',
   location: 'Location',
+  website: 'Website',
   linkedin: 'LinkedIn',
   github: 'GitHub',
-  website: 'Website',
+  orcid: 'ORCID',
 };
 
 export interface CoverLetterEditorProps {
