@@ -220,6 +220,43 @@ def _verify_original_matches(actual: Any, expected: str | None) -> bool:
     return actual.strip().casefold() == expected.strip().casefold()
 
 
+# Hyperlinks are stored inline as markdown links: [display text](url).
+_MD_LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
+
+
+def _extract_markdown_links(text: Any) -> list[tuple[str, str]]:
+    """Return (display, url) pairs for every markdown link in `text`."""
+    if not isinstance(text, str):
+        return []
+    return _MD_LINK_RE.findall(text)
+
+
+def _restore_dropped_links(original: Any, new: str) -> str | None:
+    """Re-inject any markdown link present in `original` but missing from `new`.
+
+    Full-tailor rewrites occasionally restructure a sentence and drop a link's
+    markdown wrapper, leaving the display text as plain prose (or removing it
+    entirely). The prompt rule asking the LLM to preserve links is probabilistic;
+    this is the deterministic backstop. For each original link whose URL no longer
+    appears in `new`, rewrap the plain display text if it survives. Returns the
+    patched string, or None when a link cannot be safely restored — the caller
+    rejects the change so the original (link intact) is kept.
+    """
+    links = _extract_markdown_links(original)
+    if not links:
+        return new
+    patched = new
+    for display, url in links:
+        if url in patched:
+            continue  # Link survived (display may differ, URL is what matters).
+        if display in patched:
+            # Display text is now plain prose — rewrap it as a markdown link.
+            patched = patched.replace(display, f"[{display}]({url})", 1)
+            continue
+        return None  # Link and its display text are both gone — cannot reattach.
+    return patched
+
+
 def apply_diffs(
     original: dict[str, Any],
     changes: list[ResumeChange],
@@ -298,6 +335,16 @@ def apply_diffs(
                 logger.info("Diff rejected (replace with non-string value): %s", path)
                 rejected.append(change)
                 continue
+
+            # Preserve hyperlinks: a rewrite can drop a markdown link's wrapper.
+            # Re-inject any dropped link; reject the change if it can't be safely
+            # restored so the original bullet (link intact) is kept.
+            preserved = _restore_dropped_links(change.original, change.value)
+            if preserved is None:
+                logger.info("Diff rejected (markdown link dropped): %s", path)
+                rejected.append(change)
+                continue
+            change.value = preserved
 
             if not _set_at_path(result, path, change.value):
                 rejected.append(change)
